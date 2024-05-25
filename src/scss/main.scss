@@ -1,0 +1,47 @@
+/* Base */
+@import "./base/reset";
+@import "./base/vars";
+@import "./base/base";
+@import "./base/utils";
+@import "./base/containers";
+@import "./base/sticky-footer";
+
+/* Blocks */
+@import "./blocks/*.scss";
+@import "./fbr-plugin/*.scss";
+
+
+body {
+    background-color: #2ea3f62c;
+}
+
+.blocks {
+    margin-top: 100px;
+    display: grid;
+    row-gap: 40px;
+    grid-template-columns: repeat(2, 0.5fr);
+    column-gap: 20px;
+    padding: 40px;
+    @media(max-width: 768px) {
+        grid-template-columns: repeat(1, 1fr);
+    }
+    .block {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        row-gap: 20px;
+        background-color: #ef2ef63f;
+        width: 100%;
+        min-height: 500px;
+        ul {
+            margin-top: 40px;
+            margin-left: 40px;
+            li {
+                list-style: decimal;
+                margin-bottom: 20px;
+            }
+        }
+    }
+}
