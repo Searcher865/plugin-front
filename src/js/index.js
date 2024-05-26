@@ -1,10 +1,13 @@
 import { ModalHandler } from './modules/modal';
+import { BugMarks } from './modules/bugMarks';
 
 
-    const fbrBody = document.querySelector("body")
-    const fbrContainer = document.createElement('div');
-    fbrContainer.classList.add('fbr-plugin-base');
-    fbrContainer.innerHTML = `<div class="fbr-plugin-layout">
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('fbr')) {
+const fbrBody = document.querySelector("body")
+const fbrContainer = document.createElement('div');
+fbrContainer.classList.add('fbr-plugin-base');
+fbrContainer.innerHTML = `<div class="fbr-plugin-layout">
 			<div class="fbr-plugin-balls">
 			</div>
 			
@@ -55,11 +58,11 @@ import { ModalHandler } from './modules/modal';
 						<div class="fbr-comment__switch-icon-unact">
 							on
 						</div>`;
-    fbrBody.appendChild(fbrContainer);
+fbrBody.appendChild(fbrContainer);
 
-	const style = document.createElement('style');
-	style.type = 'text/css';
-	const css = `@charset "UTF-8";
+const style = document.createElement('style');
+style.type = 'text/css';
+const css = `@charset "UTF-8";
 /* Blocks */
 .fbr-plugin-base {
   position: absolute !important;
@@ -283,7 +286,16 @@ import { ModalHandler } from './modules/modal';
   pointer-events: none !important;
   z-index: 2147483600 !important;
 }`;
-	style.appendChild(document.createTextNode(css));
-	document.head.appendChild(style);
+style.appendChild(document.createTextNode(css));
+document.head.appendChild(style);
 
+document.addEventListener('DOMContentLoaded', async () => {
+  const bugMarks = new BugMarks();
+
+  // Дождитесь завершения выполнения асинхронных функций
+  await bugMarks.getResponseBugsMarks();
+
+  // Теперь можно выполнить остальной код, который зависит от результатов асинхронных функций
   const modalHandler = new ModalHandler();
+});
+}

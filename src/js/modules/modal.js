@@ -1,7 +1,7 @@
 import { DataCollector } from './dataCollector';
-// import { BugMarks } from './bugMarks';
+import { BugMarks } from './bugMarks';
 // import { BugList } from './bugList';
-// import { BugData } from './bugData';
+import { BugData } from './bugData';
 import { createPluginBall } from "./createBall";
 
 
@@ -10,8 +10,8 @@ export class ModalHandler {
     constructor() {
         this.dataCollector = new DataCollector();
         this.formData = new FormData();
-        // this.bugData = new BugData();
-        // this.bugMarks = new BugMarks();
+        this.bugData = new BugData();
+        this.bugMarks = new BugMarks();
         // this.bugList = new BugList();
 
         this.modalElement = document.querySelector('.fbr-bug-report');
@@ -32,6 +32,16 @@ export class ModalHandler {
         }
         // Вызываем метод openModal при клике на любую точку страницы
         document.addEventListener('click', (event) => {
+
+            const isInsidePluginBase = event.target.closest('.fbr-plugin-base');
+    
+            if (!isInsidePluginBase) {
+                // Предотвращаем действие по умолчанию и остановим распространение события
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+
             // Получаем целевой элемент, на который кликнули
             const targetElement = event.target;
 
@@ -64,7 +74,7 @@ export class ModalHandler {
 
         this.submitButton.addEventListener('click', async (event) => {
             event.preventDefault();
-            await this.sendBugReport(this.formData); // Вызываем метод closeModal при клике
+            await this.sendBugReport(this.formData);
             event.stopPropagation();
         });
 
@@ -147,18 +157,6 @@ export class ModalHandler {
 
     async sendBugReport() {
 
-        // this.addToFormData("url", this.dataCollector.getCurrentURL())
-        // this.addToFormData("OSVersion", this.dataCollector.getOSVersion())
-        // this.addToFormData("browser", this.dataCollector.getBrowserInfo())
-        // this.addToFormData("pageResolution", this.dataCollector.getPageResolution())
-
-        // this.addToFormData("summary", this.inputSummary.value)
-        // this.addToFormData("description", this.inputDescription.value)
-        // this.addToFormData("actualResult", this.inputActualResult.value)
-        // this.addToFormData("expectedResult", this.inputExpectedResult.value)
-        // this.addToFormData("priority", this.selectedPriority.value)
-        // this.addToFormData("executor", this.selectedExecutor.value)
-
         this.addToFormData("url", this.dataCollector.getCurrentURL())
         this.addToFormData("OsVersion", await this.dataCollector.getOSVersion())
         this.addToFormData("environment", this.dataCollector.getEnvironment())
@@ -178,7 +176,7 @@ export class ModalHandler {
         // }
         try {
             const apiUrl = 'http://localhost:3000/api/bug';
-
+            console.log("ВЫЗЫВАЕМ /api/bug и СМОТРИМ ++++++++++++");
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 body: this.formData,
@@ -199,7 +197,7 @@ export class ModalHandler {
             this.pluginContainer.style.display = 'block';
             this.pluginContainer.style.setProperty('display', 'block', 'important');
             this.bugMarks.renderBugMark()
-            this.bugList.renderBugList()
+        /*     this.bugList.renderBugList() */
         } catch (error) {
             console.error('Произошла ошибка:', error);
             console.log('Ответ от сервера:', response);
