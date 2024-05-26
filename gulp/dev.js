@@ -192,8 +192,12 @@ gulp.task('js:dev', function () {
 });
 
 const serverOptions = {
-	livereload: true,
+	livereload: {
+		enable: true,
+		port: 35730 // Измените порт livereload здесь
+	},
 	open: true,
+  port: 8080
 };
 
 gulp.task('server:dev', function () {

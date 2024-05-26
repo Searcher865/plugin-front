@@ -147,9 +147,21 @@ export class ModalHandler {
 
     async sendBugReport() {
 
+        // this.addToFormData("url", this.dataCollector.getCurrentURL())
+        // this.addToFormData("OSVersion", this.dataCollector.getOSVersion())
+        // this.addToFormData("browser", this.dataCollector.getBrowserInfo())
+        // this.addToFormData("pageResolution", this.dataCollector.getPageResolution())
+
+        // this.addToFormData("summary", this.inputSummary.value)
+        // this.addToFormData("description", this.inputDescription.value)
+        // this.addToFormData("actualResult", this.inputActualResult.value)
+        // this.addToFormData("expectedResult", this.inputExpectedResult.value)
+        // this.addToFormData("priority", this.selectedPriority.value)
+        // this.addToFormData("executor", this.selectedExecutor.value)
+
         this.addToFormData("url", this.dataCollector.getCurrentURL())
-        this.addToFormData("OSVersion", this.dataCollector.getOSVersion())
-        this.addToFormData("browser", this.dataCollector.getBrowserInfo())
+        this.addToFormData("OsVersion", await this.dataCollector.getOSVersion())
+        this.addToFormData("environment", this.dataCollector.getEnvironment())
         this.addToFormData("pageResolution", this.dataCollector.getPageResolution())
 
         this.addToFormData("summary", this.inputSummary.value)
@@ -158,7 +170,6 @@ export class ModalHandler {
         this.addToFormData("expectedResult", this.inputExpectedResult.value)
         this.addToFormData("priority", this.selectedPriority.value)
         this.addToFormData("executor", this.selectedExecutor.value)
-
 
 
 
