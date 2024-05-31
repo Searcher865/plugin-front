@@ -43,6 +43,7 @@ export class BugMarks {
 
         // Добавляем элемент "ball" в контейнер
         bugListElement.appendChild(ball);
+        console.log("СОЗДАЕМ БОЛЛЛЛЛЛЛ");
     });
   }
 
@@ -90,6 +91,7 @@ export class BugMarks {
   
     try {
       // Отправляем GET-запрос
+      console.log("Перед отправкой запроса");
       const response = await fetch(url);
   
       if (!response.ok) {
@@ -100,6 +102,7 @@ export class BugMarks {
       const data = await response.json();
       console.log('Ответ сервера:', data);
       this.bugData.setBugs(data)
+  
       this.renderBugMark()
     } catch (error) {
       console.error('Произошла ошибка:', error);

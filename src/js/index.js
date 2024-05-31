@@ -1,9 +1,12 @@
+import { ToggleCommentHandler } from "./modules/toggleComment";
 import { ModalHandler } from './modules/modal';
 import { BugMarks } from './modules/bugMarks';
 
 
 const urlParams = new URLSearchParams(window.location.search);
+
 if (urlParams.has('fbr')) {
+  
 const fbrBody = document.querySelector("body")
 const fbrContainer = document.createElement('div');
 fbrContainer.classList.add('fbr-plugin-base');
@@ -53,11 +56,16 @@ fbrContainer.innerHTML = `<div class="fbr-plugin-layout">
 		</div><div class="fbr-plugin-container" id="pluginContainer">
 			<!-- кнопка активации режима комментирования -->
 			<div class="fbr-comment__togle" id="plugin-comment-togle" data-active="false">
+				
 				<div class="fbr-comment__switch">
 					<div class="fbr-comment__switch-togle">
 						<div class="fbr-comment__switch-icon-unact">
+							off
+						</div>
+						<div class="fbr-comment__switch-icon-act">
 							on
-						</div>`;
+						</div>
+					</div>`;
 fbrBody.appendChild(fbrContainer);
 
 const style = document.createElement('style');
@@ -67,6 +75,10 @@ const css = `@charset "UTF-8";
 .fbr-plugin-base {
   position: absolute !important;
   top: 0 !important;
+}
+
+.fbr-highlight {
+  box-shadow: 0 0 0 2px blue !important; /* Синяя обводка с важностью */
 }
 
 .fbr-plugin-container {
@@ -211,13 +223,6 @@ const css = `@charset "UTF-8";
   height: 25px !important;
   z-index: 2147483600 !important;
 }
-.fbr-comment__switch-icon-unact img, .fbr-comment__switch-icon-act img {
-  border-radius: 100%;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  z-index: 2147483600 !important;
-}
 
 .fbr-plugin-layout {
   position: relative !important;
@@ -288,14 +293,64 @@ const css = `@charset "UTF-8";
 }`;
 style.appendChild(document.createTextNode(css));
 document.head.appendChild(style);
+const modalHandler = new ModalHandler();
+const toggleCommentHandler = new ToggleCommentHandler();
+
+/* // Обертка для вызова функции после обновления DOM
+document.addEventListener('click', function(event) {
+  const target = event.target.closest('a');
+  if (target) {
+    event.preventDefault();
+    console.log('Link clicked, but default action prevented.', target.href);
+    const modalHandler = new ModalHandler();
+    // Дополнительная логика
+  }
+}, true);
+ */
+
+document.addEventListener('mouseover', function(event) {
+  // Проверяем, является ли целевой элемент или его родитель элементом с классом "fbr-plugin-base"
+  if (!event.target.closest('.fbr-plugin-base')) {
+    // Убираем обводку у всех элементов
+    document.querySelectorAll('.fbr-highlight').forEach(function(element) {
+      element.classList.remove('fbr-highlight');
+    });
+
+    // Добавляем обводку к элементу, на который наведен курсор
+    event.target.classList.add('fbr-highlight');
+  }
+});
+
+document.addEventListener('mouseout', function(event) {
+  // Убираем обводку, когда курсор покидает элемент
+  event.target.classList.remove('fbr-highlight');
+});
+
 
 document.addEventListener('DOMContentLoaded', async () => {
+
+
   const bugMarks = new BugMarks();
+  await bugMarks.getResponseBugsMarks()
 
-  // Дождитесь завершения выполнения асинхронных функций
-  await bugMarks.getResponseBugsMarks();
+  let resizeTimer;
 
-  // Теперь можно выполнить остальной код, который зависит от результатов асинхронных функций
-  const modalHandler = new ModalHandler();
+// Отслеживаем событие ресайза и если он произошел, то перересовываем все метки
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+        bugMarks.renderBugMark();
+    }, 100); // здесь задается задержка в милисекундах, чтобы реайз не срабатывал мгновенно
 });
+
+
+
+});
+
+
+
+
 }
+
+
+

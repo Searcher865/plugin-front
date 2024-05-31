@@ -74,7 +74,7 @@ export class ModalHandler {
 
         this.submitButton.addEventListener('click', async (event) => {
             event.preventDefault();
-            await this.sendBugReport(this.formData);
+            await this.sendBugReport(this.formData); // Вызываем метод closeModal при клике
             event.stopPropagation();
         });
 
@@ -176,17 +176,19 @@ export class ModalHandler {
         // }
         try {
             const apiUrl = 'http://localhost:3000/api/bug';
-            console.log("ВЫЗЫВАЕМ /api/bug и СМОТРИМ ++++++++++++");
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 body: this.formData,
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
+                alert(`Произошла ошибка: ${response.status}\nОтвет от сервера: ${JSON.stringify(data.message)}`);
                 throw new Error('Network response was not ok');
             }
 
-            const data = await response.json();
+            
             console.log('Ответ от сервера:', data);
 
             this.bugData.setBugs(data)
@@ -200,7 +202,6 @@ export class ModalHandler {
         /*     this.bugList.renderBugList() */
         } catch (error) {
             console.error('Произошла ошибка:', error);
-            console.log('Ответ от сервера:', response);
         }
     }
 

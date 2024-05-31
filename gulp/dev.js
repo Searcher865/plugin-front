@@ -56,7 +56,7 @@ const plumberNotify = (title) => {
 gulp.task('extract-html', (done) => {
   const htmlContent = fs.readFileSync(paths.htmlInput, 'utf8');
 	const pluginLayoutMatch = htmlContent.match(/<div class="fbr-plugin-layout"[^>]*>[\s\S]*?<\/div>\s*<\/div>/);
-  const pluginContainerMatch = htmlContent.match(/<div class="fbr-plugin-container"[^>]*>[\s\S]*?<\/div>/);
+  const pluginContainerMatch = htmlContent.match(/<div class="fbr-plugin-container"[^>]*>[\s\S]*?<\/div>\s*<\/div>/);
   
   if (pluginLayoutMatch && pluginContainerMatch) {
     const pluginLayout = pluginLayoutMatch[0];
