@@ -25,38 +25,46 @@ export class ModalHandler {
         this.bugFileInput = document.getElementById('bug-file');
         this.selectedPriority = document.getElementById('bug-priority');
         this.selectedExecutor = document.getElementById('bug-executor');
+        // Находим все элементы с классом .fbr-bug-report__step
+        this.steps = document.querySelectorAll('.fbr-bug-report__step');
+        // Находим все элементы с классом .fbr-bug-report__tab
+        this.tabs = document.querySelectorAll('.fbr-bug-report__tab');
+        // Получаем ссылку на кнопку "Далее"
+        this.nextButtons = document.querySelectorAll('.fbr-bug-report__next-button');
+        // Получаем ссылку на поле "Название бага"
+        this.bugTitleInput = document.querySelector('#bug-title');
 
         // Проверяем существование элемента с классом .fbr-bug-report
         if (!this.modalElement) {
             throw new Error('Элемент с классом .fbr-bug-report не найден на странице.');
         }
-        // Вызываем метод openModal при клике на любую точку страницы
+        // Обработка чтобы модальное окно не открывалось при клике на элементы модального окна, но остальныесобытия внутри модального окна работали
         document.addEventListener('click', (event) => {
-
-            const isInsidePluginBase = event.target.closest('.fbr-plugin-base');
-    
-            if (!isInsidePluginBase) {
-                // Предотвращаем действие по умолчанию и остановим распространение события
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
-
             // Получаем целевой элемент, на который кликнули
             const targetElement = event.target;
 
-            // Получаем контейнер с классом plugin-container
-            const container = document.querySelector('.fbr-plugin-container');
+            // Проверяем, не является ли целевой элемент кнопкой закрытия или другими исключенными элементами
+            if (targetElement.classList.contains('fbr-bug-report__cancel-button') || targetElement.closest('.fbr-bug-report')) {
+                return; // Выходим из обработчика, если кликнули на кнопку закрытия или внутри модального окна
+            }
 
-            // Проверяем, является ли целевой элемент потомком контейнера с классом plugin-container
-            const isInsideContainer = container.contains(targetElement);
+            const isInsidePluginBase = targetElement.closest('.fbr-plugin-base');
 
-            // Если клик был вне контейнера, выполняйте ваш код
-            if (!isInsideContainer) {
-                this.openModal(event);
-                event.stopPropagation();
+            if (!isInsidePluginBase) {
+                // Получаем контейнер с классом plugin-container
+                const container = document.querySelector('.fbr-plugin-container');
+
+                // Проверяем, является ли целевой элемент потомком контейнера с классом plugin-container
+                const isInsideContainer = container.contains(targetElement);
+
+                // Если клик был вне контейнера, выполняйте ваш код
+                if (!isInsideContainer) {
+                    this.openModal(event);
+                    event.stopPropagation();
+                }
             }
         });
+
 
         // Находим кнопку с классом bug-report__cancel-button
         this.cancelButton = this.modalElement.querySelector('.fbr-bug-report__cancel-button');
@@ -87,10 +95,12 @@ export class ModalHandler {
 
     // Функция открытия модального окна вместе с добавлением метки
     async openModal(event) {
+
         // Проверяем, что модальное окно закрыто
         if (this.modalElement.style.display === 'none' || this.modalElement.style.display === '') {
             try {
-
+                // Начинаем с показа первого этапа по умолчанию
+                this.showStep('1', this.steps, this.tabs);
                 const { xClick, yClick, xRelatively, yRelatively, heightRatio, widthRatio } = this.dataCollector.getClickCoordinates(event); // Обращаемся к функции, которая собирает данные со страницы
 
                 const xpath = this.dataCollector.getXPath(event.target); //Здесь передаем таргет в фукнцию, которая возвращает xpath
@@ -118,13 +128,128 @@ export class ModalHandler {
         }
     }
 
+    setupStepNavigation() {
+
+
+        // Добавляем обработчики событий для каждого таба
+        this.tabs.forEach(tab => {
+            tab.addEventListener('click', (event) => {
+                event.preventDefault(); // Предотвращаем перезагрузку страницы
+                // Получаем значение атрибута data-step из нажатого таба
+                const step = event.target.getAttribute('data-step');
+                // Переходим к выбранному этапу
+                this.showStep(step, this.steps, this.tabs);
+            });
+        });
+
+        // Добавляем обработчик события на изменение содержимого поля "Название бага"
+        this.bugTitleInput.addEventListener('input', () => {
+            // Проверяем, заполнено ли поле "Название бага"
+            if (this.bugTitleInput.value.trim() !== '') {
+                // Если заполнено, делаем кнопку "Далее" активной
+                this.nextButtons.forEach(nextButton => {
+                    nextButton.classList.add('active');
+                    nextButton.disabled = false;
+                })
+
+            } else {
+                // Если не заполнено, делаем кнопку "Далее" неактивной
+                this.nextButtons.forEach(nextButton => {
+                    nextButton.classList.remove('active');
+                    nextButton.disabled = true;
+                })
+
+            }
+        });
+
+        this.nextButtons.forEach(nextButton => {
+            // Добавляем обработчик события на клик по кнопке "Далее"
+            nextButton.addEventListener('click', () => {
+                // Получаем номер текущего этапа
+                const currentStep = parseInt(document.querySelector('.fbr-bug-report__tab.active').getAttribute('data-step'));
+                // Вычисляем номер следующего этапа
+                const nextStep = currentStep + 1;
+                // Показываем следующий этап
+                this.showStep(nextStep.toString(), this.steps, this.tabs);
+            });
+        })
+
+
+
+        // Начинаем с показа первого этапа по умолчанию
+        this.showStep('1', this.steps, this.tabs);
+    }
+
+    // Функция для показа выбранного этапа и скрытия остальных
+    showStep(step, steps, tabs) {
+        // Перебираем все элементы с классом .fbr-bug-report__step
+        steps.forEach(stepElement => {
+            // Показываем элемент, если его id соответствует выбранному шагу
+            if (stepElement.id === `step-${step}`) {
+                stepElement.style.display = 'block';
+
+            } else {
+                // Скрываем все остальные элементы
+                stepElement.style.display = 'none';
+            }
+        });
+
+        // Перебираем все табы
+        tabs.forEach(tab => {
+            // Добавляем класс active к табу, соответствующему выбранному шагу
+            if (tab.getAttribute('data-step') === step) {
+                tab.classList.add('active');
+                tab.disabled = false;
+            } else {
+                // Убираем класс active у всех остальных табов
+                tab.classList.remove('active');
+            }
+        });
+    }
+
+    clearFormFields() {
+        // Очистка поля "Название бага"
+        this.inputSummary.value = '';
+
+        // Очистка поля "Описание бага"
+        this.inputDescription.value = '';
+
+        // Очистка поля "Фактический результат"
+        this.inputActualResult.value = '';
+
+        // Очистка поля "Ожидаемый результат"
+        this.inputExpectedResult.value = '';
+
+        // Очистка поля "Выберите файл для ожидаемого результата"
+        this.bugFileInput.value = '';
+
+        // Перебираем все табы
+        this.tabs.forEach(tab => {
+            // Добавляем disabled к каждому табу
+            tab.disabled = true;
+        });
+
+
+        this.nextButtons.forEach(nextButton => {
+            nextButton.classList.remove('active');
+            nextButton.disabled = true;
+        })
+
+
+    }
+
     // Закрываем модальное окно
     closeModal() {
+        this.clearFormFields()
+
+        document.querySelector('.fbr-plugin-new-ball').remove();
+
 
         this.pluginContainer.style.display = 'block'
         this.pluginContainer.style.setProperty('display', 'block', 'important');
         this.modalElement.style.display = 'none';
         this.modalElement.style.setProperty('display', 'none', 'important');
+
     }
     // Функция добавления данных в форм дату
     addToFormData(name, value) {
@@ -154,6 +279,17 @@ export class ModalHandler {
         return new Blob(byteArrays, { type: contentType });
     }
 
+    // Показать лоадер
+    showLoader() {
+        const loader = document.querySelector('.fbr-loader');
+        loader.style.display = 'block';
+    }
+
+    // Скрыть лоадер
+    hideLoader() {
+        const loader = document.querySelector('.fbr-loader');
+        loader.style.display = 'none';
+    }
 
     async sendBugReport() {
 
@@ -175,6 +311,8 @@ export class ModalHandler {
         //     console.log(`1Ключ: ${pair[0]}, Значение: ${pair[1]}`);
         // }
         try {
+            this.showLoader()
+            this.submitButton.style.visibility = 'hidden'; // Скрываем кнопку "Отправить"
             const apiUrl = 'http://localhost:3000/api/bug';
             const response = await fetch(apiUrl, {
                 method: 'POST',
@@ -188,7 +326,7 @@ export class ModalHandler {
                 throw new Error('Network response was not ok');
             }
 
-            
+
             console.log('Ответ от сервера:', data);
 
             this.bugData.setBugs(data)
@@ -199,9 +337,13 @@ export class ModalHandler {
             this.pluginContainer.style.display = 'block';
             this.pluginContainer.style.setProperty('display', 'block', 'important');
             this.bugMarks.renderBugMark()
-        /*     this.bugList.renderBugList() */
+            /*     this.bugList.renderBugList() */
         } catch (error) {
             console.error('Произошла ошибка:', error);
+        } finally {
+            this.hideLoader(); // Скрыть лоадер после получения ответа от сервера
+            this.submitButton.style.visibility = 'visible'; // Восстанавливаем кнопку "Отправить"
+            this.clearFormFields()
         }
     }
 

@@ -16,41 +16,66 @@ fbrContainer.innerHTML = `<div class="fbr-plugin-layout">
 			
 			<div class="fbr-bug-report">
 				<form class="fbr-bug-report__form">
-					<label class="fbr-bug-report__input-label" for="bug-title">Название бага:</label>
-					<input class="fbr-bug-report__input-field" type="text" id="bug-title" placeholder="Введите название бага">
-			
+						 <!-- loader -->
+					<div class="fbr-loader" style="display: none;"></div>
+					 <!-- Close button -->
+					 <button class="fbr-bug-report__cancel-button" type="button">&times;</button>
+					 
+					         <!-- Navigation tabs -->
+									 <div class="fbr-bug-report__tabs">
+										<button class="fbr-bug-report__tab" data-step="1" disabled>Этап 1</button>
+										<button class="fbr-bug-report__tab " data-step="2" disabled>Этап 2</button>
+										<button class="fbr-bug-report__tab" data-step="3" disabled>Этап 3</button>
+										<button class="fbr-bug-report__tab" data-step="4" disabled>Этап 4</button>
+								</div>
+								       <!-- Step 1 -->
+											 <div class="fbr-bug-report__step" id="step-1">
+												<label class="fbr-bug-report__input-label" for="bug-title">Название бага:</label>
+												<input class="fbr-bug-report__input-field" type="text" id="bug-title" placeholder="Введите название бага">
+												
+												<label class="fbr-bug-report__input-label" for="bug-priority">Приоритет:</label>
+												<select class="fbr-bug-report__select-field" id="bug-priority" name="bug-priority">
+														<option value="critical">Критичный</option>
+														<option value="normal" selected>Средний</option>
+														<option value="minor">Низкий</option>
+												</select>
+												
+												<label class="fbr-bug-report__input-label" for="bug-executor">Исполнитель:</label>
+												<select class="fbr-bug-report__select-field" id="bug-executor" name="bug-executor">
+														<option value="frontend">Frontend</option>
+														<option value="backend">Backend</option>
+														<option value="both">Frontend и Backend</option>
+												</select>
+												
+												<button class="fbr-bug-report__next-button" type="button" disabled>Далее</button>
+										</div>
+										 <!-- Step 2 -->
+        <div class="fbr-bug-report__step" id="step-2" style="display:none;">
 					<label class="fbr-bug-report__input-label" for="bug-description">Описание бага:</label>
 					<textarea class="fbr-bug-report__textarea-field" id="bug-description" placeholder="Введите описание бага"></textarea>
 					
-					<label class="fbr-bug-report__input-label" for="bug-actual">Фактический результат:</label>
-					<textarea class="fbr-bug-report__textarea-field" id="bug-actual" placeholder="Введите описание фактического результата"></textarea>
+					<button class="fbr-bug-report__next-button" type="button">Далее</button>
+			</div>
 
-					<label class="fbr-bug-report__input-label" for="bug-expected">Ожидаемый рузльтат:</label>
-					<textarea class="fbr-bug-report__textarea-field" id="bug-expected" placeholder="Введите описание ожидаемого результата"></textarea>
-
-					<label class="fbr-bug-report__input-label" for="bug-file">Выберите файл для ожидаемоего результата:</label>
-					<input class="fbr-bug-report__input-field" type="file" id="bug-file" name="bug-file">
-
-					<!-- Поле селекта "Приоритет" -->
-					<label class="fbr-bug-report__input-label" for="bug-priority">Приоритет:</label>
-					<select class="fbr-bug-report__select-field" id="bug-priority" name="bug-priority">
-					<option value="critical">Критичный</option>
-					<option value="normal" selected>Средний</option>
-					<option value="minor">Низкий</option>
-					</select>
-
-					<!-- Поле селекта "Исполнитель" -->
-					<label class="fbr-bug-report__input-label" for="bug-executor">Исполнитель:</label>
-					<select class="fbr-bug-report__select-field" id="bug-executor" name="bug-executor">
-					<option value="frontend">Frontend</option>
-					<option value="backend">Backend</option>
-					<option value="both">Frontend и Backend</option>
-					</select>
-
-					<div class="fbr-bug-report__btn-wrapper">
-						<button class="fbr-bug-report__cancel-button" type="button">Закрыть</button>
-						<button class="fbr-bug-report__submit-button" type="button">Отправить</button>
+			       <!-- Step 3 -->
+						 <div class="fbr-bug-report__step" id="step-3" style="display:none;">
+							<label class="fbr-bug-report__input-label" for="bug-actual">Фактический результат:</label>
+							<textarea class="fbr-bug-report__textarea-field" id="bug-actual" placeholder="Введите описание фактического результата"></textarea>
+							
+							<button class="fbr-bug-report__next-button" type="button">Далее</button>
 					</div>
+
+					        <!-- Step 4 -->
+									<div class="fbr-bug-report__step" id="step-4" style="display:none;">
+										<label class="fbr-bug-report__input-label" for="bug-expected">Ожидаемый результат:</label>
+										<textarea class="fbr-bug-report__textarea-field" id="bug-expected" placeholder="Введите описание ожидаемого результата"></textarea>
+				
+										<label class="fbr-bug-report__input-label" for="bug-file">Выберите файл для ожидаемого результата:</label>
+										<input class="fbr-bug-report__input-field" type="file" id="bug-file" name="bug-file">
+				
+										<button class="fbr-bug-report__submit-button" type="button">Отправить</button>
+								</div>
+								
 				</form>
 			</div>
 		</div><div class="fbr-plugin-container" id="pluginContainer">
@@ -94,9 +119,8 @@ const css = `@charset "UTF-8";
   display: none !important;
   position: absolute !important;
   z-index: 2147483600 !important;
-  /* Стили для формы  может быть здесь нужно у z-index сделать +1*/
-  /* Стили для полей ввода и кнопок */
 }
+
 .fbr-bug-report__form {
   width: 350px !important;
   margin: 0 auto !important;
@@ -104,59 +128,105 @@ const css = `@charset "UTF-8";
   border: 1px solid #ccc !important;
   border-radius: 4px !important;
   background-color: white !important;
-  font-size: 10px !important;
+  font-size: 14px !important;
   line-height: 20px !important;
   color: #778aa7 !important;
   font-family: Gordita-Medium !important;
   font-weight: 500 !important;
   z-index: 2147483600 !important;
+  position: relative !important;
 }
-.fbr-bug-report__input-label {
-  display: block !important;
-  margin-bottom: 5px !important;
-  z-index: 2147483600 !important;
+
+.fbr-bug-report__close-button {
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  background: none !important;
+  border: none !important;
+  font-size: 30px !important;
+  cursor: pointer !important;
+  z-index: 2147483602 !important;
+  line-height: 1 !important;
+  color: #2ea2f6 !important;
 }
-.fbr-bug-report__input-field {
-  width: 100% !important;
-  padding: 10px !important;
-  margin-bottom: 10px !important;
-  border: 1px solid #ccc !important;
-  border-radius: 4px !important;
-  z-index: 2147483600 !important;
-}
-.fbr-bug-report__textarea-field {
-  width: 100% !important;
-  height: 100px !important;
-  padding: 10px !important;
-  margin-bottom: 10px !important;
-  border: 1px solid #ccc !important;
-  border-radius: 4px !important;
-  z-index: 2147483600 !important;
-}
-.fbr-bug-report__btn-wrapper {
+
+.fbr-bug-report__tabs {
   display: flex !important;
-  column-gap: 10px !important;
-  z-index: 2147483600 !important;
+  justify-content: space-between !important;
+  margin-bottom: 10px !important;
 }
+
+.fbr-bug-report__tab {
+  background: #ccc !important;
+  border: none !important;
+  padding: 5px 10px !important;
+  cursor: pointer !important;
+  z-index: 2147483600 !important;
+  border-radius: 4px !important;
+  font-size: 14px !important;
+}
+
+.fbr-bug-report__tab.active,
+.fbr-bug-report__next-button.active {
+  background-color: #2ea2f6 !important;
+  color: white !important;
+}
+
+.fbr-bug-report__input-label,
+.fbr-bug-report__input-field,
+.fbr-bug-report__textarea-field,
+.fbr-bug-report__select-field,
+.fbr-bug-report__next-button,
 .fbr-bug-report__submit-button {
-  width: 50% !important;
+  width: 100% !important;
+  margin-bottom: 10px !important;
+  z-index: 2147483600 !important;
+  font-size: 14px !important;
+}
+
+.fbr-bug-report__input-field,
+.fbr-bug-report__textarea-field,
+.fbr-bug-report__select-field {
+  padding: 10px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+}
+
+.fbr-bug-report__next-button.active {
   padding: 10px !important;
   background-color: #2ea2f6 !important;
   border: none !important;
   border-radius: 4px !important;
   color: white !important;
   cursor: pointer !important;
-  z-index: 2147483600 !important;
 }
-.fbr-bug-report__cancel-button {
-  width: 50% !important;
+
+.fbr-bug-report__next-button {
   padding: 10px !important;
-  background-color: #ccc !important;
+  background-color: #909497 !important;
   border: none !important;
   border-radius: 4px !important;
   color: white !important;
   cursor: pointer !important;
-  z-index: 2147483600 !important;
+}
+
+.fbr-bug-report__submit-button {
+  padding: 10px !important;
+  background-color: #2ea2f6 !important;
+  border: none !important;
+  border-radius: 4px !important;
+  color: white !important;
+  cursor: pointer !important;
+}
+
+.fbr-bug-report__modal-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Затемненный фон с прозрачностью 50% */
+  z-index: 2147483602; /* Ниже z-index модального окна, но выше других элементов */
 }
 
 .fbr-comment__togle {
@@ -224,6 +294,38 @@ const css = `@charset "UTF-8";
   z-index: 2147483600 !important;
 }
 
+/* Стили для лоадера */
+.fbr-loader {
+  border: 4px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 4px solid #3498db;
+  width: 30px;
+  height: 30px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+  position: absolute;
+  top: 85%;
+  left: 45%;
+  transform: translate(-50%, -50%);
+  z-index: 2147483601; /* Выше z-index модального окна, чтобы лоадер был видимым */
+}
+
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 .fbr-plugin-layout {
   position: relative !important;
   z-index: 2147483600 !important;
@@ -295,18 +397,8 @@ style.appendChild(document.createTextNode(css));
 document.head.appendChild(style);
 const modalHandler = new ModalHandler();
 const toggleCommentHandler = new ToggleCommentHandler();
+modalHandler.setupStepNavigation()
 
-/* // Обертка для вызова функции после обновления DOM
-document.addEventListener('click', function(event) {
-  const target = event.target.closest('a');
-  if (target) {
-    event.preventDefault();
-    console.log('Link clicked, but default action prevented.', target.href);
-    const modalHandler = new ModalHandler();
-    // Дополнительная логика
-  }
-}, true);
- */
 
 document.addEventListener('mouseover', function(event) {
   // Проверяем, является ли целевой элемент или его родитель элементом с классом "fbr-plugin-base"
@@ -333,6 +425,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const bugMarks = new BugMarks();
   await bugMarks.getResponseBugsMarks()
 
+
   let resizeTimer;
 
 // Отслеживаем событие ресайза и если он произошел, то перересовываем все метки
@@ -346,6 +439,8 @@ window.addEventListener('resize', function() {
 
 
 });
+
+
 
 
 

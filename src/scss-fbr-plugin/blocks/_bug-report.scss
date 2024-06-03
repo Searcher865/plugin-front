@@ -2,75 +2,111 @@
     display: none !important;
     position: absolute !important;
     z-index: 2147483600 !important;
-    /* Стили для формы  может быть здесь нужно у z-index сделать +1*/
-    
-    &__form {
-        width: 350px !important;
-        margin: 0 auto !important;
-        padding: 15px !important;
-        border: 1px solid #ccc !important;
-        border-radius: 4px !important;
-        background-color: white !important;
-        font-size: 10px !important;
-        line-height: 20px !important;
-        color: #778aa7 !important;
-        font-family: Gordita-Medium !important;
-        font-weight: 500 !important;
-        z-index: 2147483600 !important;
-    }
-    /* Стили для полей ввода и кнопок */
-    &__input-label {
-        display: block !important;
-        margin-bottom: 5px !important;
-        z-index: 2147483600 !important;
-    }
-
-    &__input-field {
-        width: 100% !important;
-        padding: 10px !important;
-        margin-bottom: 10px !important;
-        border: 1px solid #ccc !important;
-        border-radius: 4px !important;
-        z-index: 2147483600 !important;
-    }
-
-    &__textarea-field {
-        width: 100% !important;
-        height: 100px !important;
-        padding: 10px !important;
-        margin-bottom: 10px !important;
-        border: 1px solid #ccc !important;
-        border-radius: 4px !important;
-        z-index: 2147483600 !important;
-    }
-    &__btn-wrapper {
-        display: flex !important;
-        column-gap: 10px !important;
-        z-index: 2147483600 !important;
-    }
-    &__submit-button {
-        width: 50% !important;
-        padding: 10px !important;
-        background-color: #2ea2f6 !important;
-        border: none !important;
-        border-radius: 4px !important;
-        color: white !important;
-        cursor: pointer !important;
-        z-index: 2147483600 !important;
-    }
-    
-    &__cancel-button {
-        width: 50% !important;
-        padding: 10px !important;
-        background-color: #ccc !important;
-        border: none !important;
-        border-radius: 4px !important;
-        color: white !important;
-        cursor: pointer !important;
-        z-index: 2147483600 !important;
-    }
-    
 }
 
+.fbr-bug-report__form {
+    width: 350px !important;
+    margin: 0 auto !important;
+    padding: 15px !important;
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+    background-color: white !important;
+    font-size: 14px !important;
+    line-height: 20px !important;
+    color: #778aa7 !important;
+    font-family: Gordita-Medium !important;
+    font-weight: 500 !important;
+    z-index: 2147483600 !important;
+    position: relative !important;
+}
 
+.fbr-bug-report__close-button {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    background: none !important;
+    border: none !important;
+    font-size: 30px !important;
+    cursor: pointer !important;
+    z-index: 2147483602 !important;
+    line-height: 1 !important;
+    color: #2ea2f6 !important;
+}
 
+.fbr-bug-report__tabs {
+    display: flex !important;
+    justify-content: space-between !important;
+    margin-bottom: 10px !important;
+}
+
+.fbr-bug-report__tab {
+    background: #ccc !important;
+    border: none !important;
+    padding: 5px 10px !important;
+    cursor: pointer !important;
+    z-index: 2147483600 !important;
+    border-radius: 4px !important;
+    font-size: 14px !important;
+}
+
+.fbr-bug-report__tab.active,
+.fbr-bug-report__next-button.active{
+    background-color: #2ea2f6 !important;
+    color: white !important;
+}
+
+.fbr-bug-report__input-label,
+.fbr-bug-report__input-field,
+.fbr-bug-report__textarea-field,
+.fbr-bug-report__select-field,
+.fbr-bug-report__next-button,
+.fbr-bug-report__submit-button {
+    width: 100% !important;
+    margin-bottom: 10px !important;
+    z-index: 2147483600 !important;
+    font-size: 14px !important;
+}
+
+.fbr-bug-report__input-field,
+.fbr-bug-report__textarea-field,
+.fbr-bug-report__select-field {
+    padding: 10px !important;
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+}
+
+.fbr-bug-report__next-button.active {
+    padding: 10px !important;
+    background-color: #2ea2f6 !important;
+    border: none !important;
+    border-radius: 4px !important;
+    color: white !important;
+    cursor: pointer !important;
+}
+
+.fbr-bug-report__next-button {
+    padding: 10px !important;
+    background-color: #909497 !important;
+    border: none !important;
+    border-radius: 4px !important;
+    color: white !important;
+    cursor: pointer !important;
+}
+
+.fbr-bug-report__submit-button {
+    padding: 10px !important;
+    background-color: #2ea2f6 !important;
+    border: none !important;
+    border-radius: 4px !important;
+    color: white !important;
+    cursor: pointer !important;
+}
+.fbr-bug-report__modal-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Затемненный фон с прозрачностью 50% */
+    z-index: 2147483602; /* Ниже z-index модального окна, но выше других элементов */
+}
