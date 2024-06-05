@@ -120,11 +120,10 @@ const css = `@charset "UTF-8";
   position: absolute !important;
   z-index: 2147483600 !important;
 }
-
 .fbr-bug-report__form {
   width: 350px !important;
   margin: 0 auto !important;
-  padding: 15px !important;
+  padding: 0px 15px 15px 15px !important;
   border: 1px solid #ccc !important;
   border-radius: 4px !important;
   background-color: white !important;
@@ -136,11 +135,9 @@ const css = `@charset "UTF-8";
   z-index: 2147483600 !important;
   position: relative !important;
 }
-
-.fbr-bug-report__close-button {
-  position: absolute !important;
-  top: 10px !important;
-  right: 10px !important;
+.fbr-bug-report__cancel-button {
+  position: relative;
+  left: 95%;
   background: none !important;
   border: none !important;
   font-size: 30px !important;
@@ -149,13 +146,11 @@ const css = `@charset "UTF-8";
   line-height: 1 !important;
   color: #2ea2f6 !important;
 }
-
 .fbr-bug-report__tabs {
   display: flex !important;
   justify-content: space-between !important;
   margin-bottom: 10px !important;
 }
-
 .fbr-bug-report__tab {
   background: #ccc !important;
   border: none !important;
@@ -165,42 +160,21 @@ const css = `@charset "UTF-8";
   border-radius: 4px !important;
   font-size: 14px !important;
 }
-
-.fbr-bug-report__tab.active,
-.fbr-bug-report__next-button.active {
+.fbr-bug-report__tab.active {
   background-color: #2ea2f6 !important;
   color: white !important;
 }
-
-.fbr-bug-report__input-label,
-.fbr-bug-report__input-field,
-.fbr-bug-report__textarea-field,
-.fbr-bug-report__select-field,
-.fbr-bug-report__next-button,
-.fbr-bug-report__submit-button {
+.fbr-bug-report__input-label, .fbr-bug-report__input-field, .fbr-bug-report__textarea-field, .fbr-bug-report__select-field, .fbr-bug-report__next-button, .fbr-bug-report__submit-button {
   width: 100% !important;
   margin-bottom: 10px !important;
   z-index: 2147483600 !important;
   font-size: 14px !important;
 }
-
-.fbr-bug-report__input-field,
-.fbr-bug-report__textarea-field,
-.fbr-bug-report__select-field {
+.fbr-bug-report__input-field, .fbr-bug-report__textarea-field, .fbr-bug-report__select-field {
   padding: 10px !important;
   border: 1px solid #ccc !important;
   border-radius: 4px !important;
 }
-
-.fbr-bug-report__next-button.active {
-  padding: 10px !important;
-  background-color: #2ea2f6 !important;
-  border: none !important;
-  border-radius: 4px !important;
-  color: white !important;
-  cursor: pointer !important;
-}
-
 .fbr-bug-report__next-button {
   padding: 10px !important;
   background-color: #909497 !important;
@@ -209,7 +183,13 @@ const css = `@charset "UTF-8";
   color: white !important;
   cursor: pointer !important;
 }
-
+.fbr-bug-report__next-button.active {
+  background-color: #2ea2f6 !important;
+  border: none !important;
+  border-radius: 4px !important;
+  color: white !important;
+  cursor: pointer !important;
+}
 .fbr-bug-report__submit-button {
   padding: 10px !important;
   background-color: #2ea2f6 !important;
@@ -219,16 +199,35 @@ const css = `@charset "UTF-8";
   cursor: pointer !important;
 }
 
-.fbr-bug-report__modal-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Затемненный фон с прозрачностью 50% */
-  z-index: 2147483602; /* Ниже z-index модального окна, но выше других элементов */
+@media only screen and (max-width: 768px) {
+  .fbr-bug-report__form {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 15px !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background-color: white !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 2147483600 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+  .fbr-bug-report__cancel-button {
+    position: relative;
+    left: 47%;
+    background: none !important;
+    border: none !important;
+    font-size: 30px !important;
+    cursor: pointer !important;
+    z-index: 2147483602 !important;
+    line-height: 1 !important;
+    color: #2ea2f6 !important;
+  }
 }
-
 .fbr-comment__togle {
   pointer-events: all !important;
   z-index: 999 !important;

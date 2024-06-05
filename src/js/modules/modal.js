@@ -82,7 +82,7 @@ export class ModalHandler {
 
         this.submitButton.addEventListener('click', async (event) => {
             event.preventDefault();
-            await this.sendBugReport(this.formData); // Вызываем метод closeModal при клике
+            await this.sendBugReport(this.formData);
             event.stopPropagation();
         });
 
@@ -338,12 +338,14 @@ export class ModalHandler {
             this.pluginContainer.style.setProperty('display', 'block', 'important');
             this.bugMarks.renderBugMark()
             /*     this.bugList.renderBugList() */
+            this.clearFormFields()
         } catch (error) {
             console.error('Произошла ошибка:', error);
+            alert(`Отсутствует соединение с сервером `+error);
         } finally {
             this.hideLoader(); // Скрыть лоадер после получения ответа от сервера
             this.submitButton.style.visibility = 'visible'; // Восстанавливаем кнопку "Отправить"
-            this.clearFormFields()
+
         }
     }
 

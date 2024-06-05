@@ -106,6 +106,7 @@ export class BugMarks {
       this.renderBugMark()
     } catch (error) {
       console.error('Произошла ошибка:', error);
+      alert(`Отсутствует соединение с сервером `+error);
     }
 }
 
