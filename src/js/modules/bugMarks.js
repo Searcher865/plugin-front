@@ -86,7 +86,7 @@ export class BugMarks {
   }
 
   async getResponseBugsMarks() {
-    const url = new URL('http://localhost:3000/api/bugs');
+    const url = new URL(`${config.apiUrl}/bugs`);
     const urlPage = this.dataCollector.getCurrentURL()
     url.searchParams.append('url', urlPage);
   

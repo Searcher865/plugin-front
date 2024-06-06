@@ -1,5 +1,5 @@
 const config = {
-	mode: 'production',
+	mode: 'none',
 	entry: {
 		index: './src/js/index.js'
 		// contacts: './src/js/contacts.js',

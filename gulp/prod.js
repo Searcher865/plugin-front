@@ -3,21 +3,21 @@ const gulp = require('gulp');
 // HTML
 const cheerio = require('cheerio');
 const fileInclude = require('gulp-file-include');
-
-
+const htmlclean = require('gulp-htmlclean');
+const webpHTML = require('gulp-webp-html');
 
 // SASS
 const sass = require('gulp-sass')(require('sass'));
 const sassGlob = require('gulp-sass-glob');
-
-
-
+const autoprefixer = require('gulp-autoprefixer');
+const csso = require('gulp-csso');
+const webpCss = require('gulp-webp-css');
 
 const server = require('gulp-server-livereload');
 const clean = require('gulp-clean');
 const fs = require('fs');
 const sourceMaps = require('gulp-sourcemaps');
-
+const groupMedia = require('gulp-group-css-media-queries');
 const plumber = require('gulp-plumber');
 const notify = require('gulp-notify');
 const webpack = require('webpack-stream');
@@ -27,25 +27,23 @@ const path = require('path');
 const replace = require('gulp-replace');
 const dom = require('gulp-dom');
 
-const htmlmin = require('gulp-htmlmin');
-const injectString = require('gulp-inject-string');
-const uglify = require('gulp-uglify');
-
 // Images
 const imagemin = require('gulp-imagemin');
+const webp = require('gulp-webp');
+
 
 const paths = {
 	htmlInput: 'src/html/preIndex.html',  // входной HTML файл
 	htmlOutput: 'src/html/index.html',    // выходной HTML файл
 	js: 'src/js/modules/frontendPlugin.js',
-	build: 'build/js',                     // директория для сборки JS
+	prod: 'prod/js',                     // директория для сборки JS
 };
 
 
-gulp.task('clean:dev', function (done) {
-	if (fs.existsSync('./build/')) {
+gulp.task('clean:prod', function (done) {
+	if (fs.existsSync('./prod/')) {
 		return gulp
-			.src('./build/', { read: false })
+			.src('./prod/', { read: false })
 			.pipe(clean({ force: true }));
 	}
 	done();
@@ -91,6 +89,7 @@ gulp.task('extract-html', (done) => {
 	}
 });
 
+
 // Задача для удаления блока из HTML
 gulp.task('remove-container', () => {
 	return gulp.src(paths.htmlOutput)
@@ -120,17 +119,17 @@ gulp.task('clean-up', (done) => {
 	done();
 });
 
-
-gulp.task('html:dev', function () {
-	return (
-		gulp
-			.src(['./src/html/**/*.html', '!./src/html/blocks/*.html', '!./src/html/preIndex.html'])
-			.pipe(changed('./build/', { hasChanged: changed.compareContents }))
-			.pipe(plumber(plumberNotify('HTML')))
-			.pipe(fileInclude(fileIncludeSetting))
-			.pipe(gulp.dest('./build/'))
-	);
+gulp.task('html:prod', function () {
+	return gulp
+		.src(['./src/html/**/*.html', '!./src/html/blocks/*.html', '!./src/html/preIndex.html'])
+		.pipe(changed('./prod/'))
+		.pipe(plumber(plumberNotify('HTML')))
+		.pipe(fileInclude(fileIncludeSetting))
+		.pipe(webpHTML())
+		.pipe(htmlclean())
+		.pipe(gulp.dest('./prod/'));
 });
+
 
 // Задача для компиляции SCSS файлов для плагина
 gulp.task('sass-plugin', function () {
@@ -162,8 +161,23 @@ gulp.task('clean-up-css', (done) => {
 // Объединенная задача для компиляции SCSS и обновления JS
 gulp.task('process-css', gulp.series('sass-plugin', 'update-js-css', 'clean-up-css'));
 
+/* gulp.task('sass:prod', function () {
+	return gulp
+		.src('./src/scss/*.scss')
+		.pipe(changed('./prod/css/'))
+		.pipe(plumber(plumberNotify('SCSS')))
+		.pipe(sourceMaps.init())
+		.pipe(autoprefixer())
+		.pipe(sassGlob())
+		.pipe(webpCss())
+		.pipe(groupMedia())
+		.pipe(sass())
+		.pipe(csso())
+		.pipe(sourceMaps.write())
+		.pipe(gulp.dest('./prod/css/'));
+}); */
 // Задача для компиляции SCSS файлов для сайта
-gulp.task('sass:dev', function () {
+gulp.task('sass:prod', function () {
 	return (
 		gulp
 			.src('./src/scss/*.scss')
@@ -173,73 +187,74 @@ gulp.task('sass:dev', function () {
 			.pipe(sassGlob())
 			.pipe(sass())
 			.pipe(sourceMaps.write())
-			.pipe(gulp.dest('./build/css/'))
+			.pipe(gulp.dest('./prod/css/'))
 	);
 });
 
-gulp.task('images:dev', function () {
+gulp.task('images:prod', function () {
 	return gulp
 		.src('./src/img/**/*')
-		.pipe(changed('./build/img/'))
-		// .pipe(imagemin({ verbose: true }))
-		.pipe(gulp.dest('./build/img/'));
+		.pipe(changed('./prod/img/'))
+		.pipe(webp())
+		.pipe(gulp.dest('./prod/img/'))
+		.pipe(gulp.src('./src/img/**/*'))
+		.pipe(changed('./prod/img/'))
+		.pipe(imagemin({ verbose: true }))
+		.pipe(gulp.dest('./prod/img/'));
 });
 
-gulp.task('fonts:dev', function () {
+gulp.task('fonts:prod', function () {
 	return gulp
 		.src('./src/fonts/**/*')
-		.pipe(changed('./build/fonts/'))
-		.pipe(gulp.dest('./build/fonts/'));
+		.pipe(changed('./prod/fonts/'))
+		.pipe(gulp.dest('./prod/fonts/'));
 });
 
-gulp.task('files:dev', function () {
+gulp.task('files:prod', function () {
 	return gulp
 		.src('./src/files/**/*')
-		.pipe(changed('./build/files/'))
-		.pipe(gulp.dest('./build/files/'));
+		.pipe(changed('./prod/files/'))
+		.pipe(gulp.dest('./prod/files/'));
 });
 
-gulp.task('js:dev', function () {
+gulp.task('js:prod', function () {
 	return gulp
 		.src('./src/js/*.js')
-		.pipe(changed('./build/js/'))
+		.pipe(changed('./prod/js/'))
 		.pipe(plumber(plumberNotify('JS')))
-		.pipe(babel({
-			presets: ["@babel/preset-env"],
-			plugins: ["transform-remove-console"]
-	}))
-		.pipe(webpack(require('./../webpack.configDev.js')))
-		.pipe(gulp.dest('./build/js/'));
+		.pipe(babel())
+		.pipe(webpack(require('../webpack.configProd.js')))
+		.pipe(gulp.dest('./prod/js/'));
 });
 
 const serverOptions = {
 	livereload: {
 		enable: true,
-		port: 35730 // Измените порт livereload здесь
+		port: 35731 // Измените порт livereload здесь
 	},
 	open: true,
-  port: 8080
+  port: 8081
 };
 
-gulp.task('server:dev', function () {
-	return gulp.src('./build/').pipe(server(serverOptions));
+gulp.task('server:prod', function () {
+	return gulp.src('./prod/').pipe(server(serverOptions));
 });
+
 
 // Объединенная задача для обработки HTML
 gulp.task('html-process', gulp.series('extract-html', 'remove-container', 'update-js', 'clean-up'));
 
 // Задача для отслеживания изменений
-gulp.task('watch:dev', function () {
+gulp.task('watch:prod', function () {
 	gulp.watch('./src/html/preIndex.html', gulp.series('html-process')); // Обработка HTML при изменении исходного файла
 	gulp.watch('./src/scss-fbr-plugin/**/*.scss', gulp.series('process-css'));
-	gulp.watch('./src/scss/**/*.scss', gulp.parallel('sass:dev'));
-	gulp.watch(['./src/html/**/*.html', '!./src/html/preIndex.html'], gulp.parallel('html:dev')); // Обработка всех HTML файлов кроме preIndex.html
-	gulp.watch('./src/img/**/*', gulp.parallel('images:dev'));
-	gulp.watch('./src/fonts/**/*', gulp.parallel('fonts:dev'));
-	gulp.watch('./src/files/**/*', gulp.parallel('files:dev'));
-	gulp.watch('./src/js/**/*.js', gulp.parallel('js:dev'));
+	gulp.watch('./src/scss/**/*.scss', gulp.parallel('sass:prod'));
+	gulp.watch(['./src/html/**/*.html', '!./src/html/preIndex.html'], gulp.parallel('html:prod')); // Обработка всех HTML файлов кроме preIndex.html
+	gulp.watch('./src/img/**/*', gulp.parallel('images:prod'));
+	gulp.watch('./src/fonts/**/*', gulp.parallel('fonts:prod'));
+	gulp.watch('./src/files/**/*', gulp.parallel('files:prod'));
+	gulp.watch('./src/js/**/*.js', gulp.parallel('js:prod'));
 });
 
 // Задача по умолчанию
-gulp.task('default', gulp.series('html-process', 'process-css', 'watch:dev'));
-
+gulp.task('default', gulp.series('html-process', 'process-css', 'watch:prod'));
