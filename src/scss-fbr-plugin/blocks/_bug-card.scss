@@ -1,0 +1,62 @@
+.fbr-bug-card {
+    padding: 10px !important;
+    color: #4c617f !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    border-bottom: 1px solid #d4dae3 !important;
+    cursor: pointer !important;
+    z-index: 2147483600 !important;
+    &__header {
+        display: flex !important; 
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        margin-bottom: 5px !important;
+        z-index: 2147483600 !important;
+    }
+    &__number {
+        width: 26px !important;
+        height: 26px !important;
+        line-height: 20px !important;
+        font-size: 10px !important;
+        border: 2px solid #fff !important;
+        background: #2ea2f6 !important;
+        margin-right: 5px !important;
+        font-family: Gordita-Medium !important;
+        font-weight: 500 !important;
+        border-radius: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        color: white !important;
+        z-index: 2147483600 !important;
+    }
+    &__author {
+        flex-grow: 1 !important; /* Занимает оставшееся место в строке */
+        margin-right: 10px !important;
+        font-family: Gordita-Medium !important;
+        font-weight: 500 !important;
+        font-size: 12px !important;
+        line-height: 20px !important;
+        color: #1c232d !important;
+        z-index: 2147483600 !important;
+    }
+    &__date {
+        font-size: 10px !important;
+        line-height: 20px !important;
+        color: #778aa7 !important;
+        font-family: Gordita-Medium !important;
+        font-weight: 500 !important;
+        z-index: 2147483600 !important;
+    }
+    &__title {
+        font-size: 12px !important;
+        line-height: 18px !important;
+        font-family: Manrope-SemiBold !important;
+        font-weight: 600 !important;
+        color: #303d4e !important;
+        z-index: 2147483600 !important;
+    }
+  }
+
+.bug-sidebar-open {
+    left: 0 !important;
+}

@@ -1,0 +1,136 @@
+.fbr-sidebar {
+    pointer-events: all !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: -282px !important; /* Скрываем сайдбар за пределами экрана */
+    width: 282px !important;
+    height: 100% !important;
+    background-color: white !important;
+    color: #4c617f !important;
+    transition: left 0.3s ease !important;
+    max-height: calc(100%) !important; /* 20px - отступ от верхней и нижней границы */
+    overflow-y: scroll !important;
+    display: block !important;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2) !important;
+    z-index: 2147483600 !important;
+    &--active {
+        left: 0 !important;
+        z-index: 2147483600 !important;
+    }
+    &__toggle {
+        pointer-events: all !important;
+        position: fixed !important;
+        bottom: 15px !important;
+        left: 15px !important;
+        z-index: 2147483601 !important;
+        &-btn {
+            width: 60px !important;
+            height: 60px !important;
+            background-color: white !important;
+            border-radius: 100% !important;
+            box-shadow: 0 10px 35px 0 rgba(0,0,0,.15) !important;
+            z-index: 2147483600 !important;
+            img {
+                width: 30px !important;
+                height: 30px !important;
+                z-index: 2147483600 !important;
+            }
+        }
+    }
+    &__header {
+        position: sticky !important;
+        top: 0 !important;
+        background-color: white !important;
+        display: block !important;
+        z-index: 2147483600 !important;
+        // height: 100px; //высота шапки сайдбара
+    }
+    &__tabs {
+        position: sticky !important;
+        // top: 100px; //отодвигаем табы на высоту шапки
+        background-color: white !important;
+        border-bottom: 1px solid #d4dae3 !important;
+        padding-bottom: 10px !important;
+        display: flex !important;
+        z-index: 2147483600 !important;
+        
+    }
+    &__tab {
+        width: 50% !important;
+        color: gray !important;
+        position: relative !important;
+        padding: 6px 14px!important;
+        font-size: 12px!important;
+        line-height: 26px!important;
+        color: #4c617f!important;
+        text-align: center!important;
+        transition: all .15s ease!important;
+        position: relative!important;
+        font-family: Gordita-Medium!important;
+        font-weight: 500!important;
+        cursor: pointer!important;
+        background: transparent!important;
+        text-decoration: none!important;
+        z-index: 2147483600 !important;
+        &::after {
+            position: absolute !important;
+            content: '';
+            height: 2px !important;
+            width: 0% !important;
+            background-color: #2ea2f6 !important;
+            bottom: -5px !important;
+            left: 50% !important;
+            transition: all 0.2s ease-in !important;
+            z-index: 2147483600 !important;
+        }
+        &--active {
+            color: #2ea2f6!important;
+            z-index: 2147483600 !important;
+            
+            &::after {
+                width: 100% !important;
+                left: 0 !important;
+                border-radius: 4px!important;
+                z-index: 2147483600 !important;
+            }
+        }
+    }
+    &__tab-content {
+        background-color: white !important;
+        color: white !important;
+        display: none !important;
+        z-index: 2147483600 !important;
+        &--active {
+            display: block !important;
+            z-index: 2147483600 !important;
+        }
+    }
+}
+
+
+.fbr-sidebar {
+        /* Кастомный скроллбар */
+        &::-webkit-scrollbar {
+            width: 5px !important; /* Ширина скроллбара */
+            z-index: 2147483600 !important;
+        }
+    
+        /* Фон скроллбара */
+        &::-webkit-scrollbar-track {
+            background-color: #f1f1f1 !important;
+            z-index: 2147483600 !important;
+        }
+    
+        /* Стили для полосы скроллбара */
+        &::-webkit-scrollbar-thumb {
+            background-color: #888 !important;
+            border-radius: 6px !important;
+            z-index: 2147483600 !important;
+        }
+    
+        /* Стили для полосы скроллбара при наведении на неё */
+        &::-webkit-scrollbar-thumb:hover {
+            background-color: #555 !important;
+            z-index: 2147483600 !important;
+        }
+}

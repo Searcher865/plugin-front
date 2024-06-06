@@ -1,0 +1,9 @@
+.fbr-bug-sidebar{
+    &__close-icon {
+        pointer-events: none !important;
+        width: 40px !important;
+        height: 40px !important;
+        object-fit: cover !important;
+        z-index: 2147483600 !important;
+    }
+}

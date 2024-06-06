@@ -1,3 +1,5 @@
+const cheerio = require('cheerio');
+
 const gulp = require('gulp');
 const htmlmin = require('gulp-htmlmin');
 const injectString = require('gulp-inject-string');
@@ -23,7 +25,7 @@ const replace = require('gulp-replace');
 const paths = {
 	htmlInput: 'src/html/preIndex.html',  // входной HTML файл
 	htmlOutput: 'src/html/index.html',    // выходной HTML файл
-	js: 'src/js/index.js',
+	js: 'src/js/modules/frontendPlugin.js',
 	build: 'build/js',                     // директория для сборки JS
 };
 
@@ -54,15 +56,19 @@ const plumberNotify = (title) => {
 
 // Задача для извлечения HTML блока и сохранения его в отдельный файл
 gulp.task('extract-html', (done) => {
-  const htmlContent = fs.readFileSync(paths.htmlInput, 'utf8');
-	const pluginLayoutMatch = htmlContent.match(/<div class="fbr-plugin-layout"[^>]*>[\s\S]*?<\/div>\s*<\/div>/);
-  const pluginContainerMatch = htmlContent.match(/<div class="fbr-plugin-container"[^>]*>[\s\S]*?<\/div>\s*<\/div>/);
-  
-  if (pluginLayoutMatch && pluginContainerMatch) {
-    const pluginLayout = pluginLayoutMatch[0];
-    const pluginContainer = pluginContainerMatch[0];
-    fs.writeFileSync('plugin-layout.html', pluginLayout);
-    fs.writeFileSync('plugin-container.html', pluginContainer);
+	const htmlContent = fs.readFileSync(paths.htmlInput, 'utf8');
+	const $ = cheerio.load(htmlContent);
+
+	const pluginLayout = $('.fbr-plugin-layout');
+	const pluginContainer = $('.fbr-plugin-container');
+
+	if (pluginLayout.length > 0 && pluginContainer.length > 0) {
+			// Сохраняем содержимое и классы в отдельные файлы
+			const layoutHtml = pluginLayout.html();
+			const containerHtml = pluginContainer.html();
+
+			fs.writeFileSync('plugin-layout.html', `<div class="fbr-plugin-layout">${layoutHtml}</div>`);
+			fs.writeFileSync('plugin-container.html', `<div class="fbr-plugin-container" id="pluginContainer">${containerHtml}</div>`);
 
 		// Копируем preIndex.html в index.html
 		fs.copyFileSync(paths.htmlInput, paths.htmlOutput);
@@ -92,7 +98,7 @@ gulp.task('update-js', () => {
 
   return gulp.src(paths.js)
     .pipe(replace(/fbrContainer\.innerHTML = `[^`]*`;/s, `fbrContainer.innerHTML = \`${combinedContent}\`;`))
-    .pipe(gulp.dest('src/js/'));
+    .pipe(gulp.dest('src/js/modules'));
 });
 
 // Удаление файла с html блоком
@@ -131,7 +137,7 @@ gulp.task('update-js-css', function (done) {
 	gulp
 		.src(paths.js)
 		.pipe(replace(/const css = `[\s\S]*?`;/, `const css = \`${cssContent}\`;`))
-		.pipe(gulp.dest('src/js/'))
+		.pipe(gulp.dest('src/js/modules'))
 		.on('end', done);
 });
 

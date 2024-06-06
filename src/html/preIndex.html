@@ -1,138 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>тест plugin</title>
-		<link rel="stylesheet" href="./css/main.css" />
-	</head>
-	<body>
-		@@include('blocks/header.html')
 
-		<div class="fbr-plugin-layout">
-			<div class="fbr-plugin-balls">
-			</div>
-			
-			<div class="fbr-bug-report">
-				<form class="fbr-bug-report__form">
-						 <!-- loader -->
-					<div class="fbr-loader" style="display: none;"></div>
-					 <!-- Close button -->
-					 <button class="fbr-bug-report__cancel-button" type="button">&times;</button>
-					 
-					         <!-- Navigation tabs -->
-									 <div class="fbr-bug-report__tabs">
-										<button class="fbr-bug-report__tab" data-step="1" disabled>Этап 1</button>
-										<button class="fbr-bug-report__tab " data-step="2" disabled>Этап 2</button>
-										<button class="fbr-bug-report__tab" data-step="3" disabled>Этап 3</button>
-										<button class="fbr-bug-report__tab" data-step="4" disabled>Этап 4</button>
-								</div>
-								       <!-- Step 1 -->
-											 <div class="fbr-bug-report__step" id="step-1">
-												<label class="fbr-bug-report__input-label" for="bug-title">Название бага:</label>
-												<input class="fbr-bug-report__input-field" type="text" id="bug-title" placeholder="Введите название бага">
-												
-												<label class="fbr-bug-report__input-label" for="bug-priority">Приоритет:</label>
-												<select class="fbr-bug-report__select-field" id="bug-priority" name="bug-priority">
-														<option value="critical">Критичный</option>
-														<option value="normal" selected>Средний</option>
-														<option value="minor">Низкий</option>
-												</select>
-												
-												<label class="fbr-bug-report__input-label" for="bug-executor">Исполнитель:</label>
-												<select class="fbr-bug-report__select-field" id="bug-executor" name="bug-executor">
-														<option value="frontend">Frontend</option>
-														<option value="backend">Backend</option>
-														<option value="both">Frontend и Backend</option>
-												</select>
-												
-												<button class="fbr-bug-report__next-button" type="button" disabled>Далее</button>
-										</div>
-										 <!-- Step 2 -->
-        <div class="fbr-bug-report__step" id="step-2" style="display:none;">
-					<label class="fbr-bug-report__input-label" for="bug-description">Описание бага:</label>
-					<textarea class="fbr-bug-report__textarea-field" id="bug-description" placeholder="Введите описание бага"></textarea>
-					
-					<button class="fbr-bug-report__next-button" type="button">Далее</button>
-			</div>
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>тест plugin</title>
+	<link rel="stylesheet" href="./css/main.css" />
+</head>
 
-			       <!-- Step 3 -->
-						 <div class="fbr-bug-report__step" id="step-3" style="display:none;">
-							<label class="fbr-bug-report__input-label" for="bug-actual">Фактический результат:</label>
-							<textarea class="fbr-bug-report__textarea-field" id="bug-actual" placeholder="Введите описание фактического результата"></textarea>
-							
-							<button class="fbr-bug-report__next-button" type="button">Далее</button>
-					</div>
+<body>
+	@@include('blocks/header.html')
 
-					        <!-- Step 4 -->
-									<div class="fbr-bug-report__step" id="step-4" style="display:none;">
-										<label class="fbr-bug-report__input-label" for="bug-expected">Ожидаемый результат:</label>
-										<textarea class="fbr-bug-report__textarea-field" id="bug-expected" placeholder="Введите описание ожидаемого результата"></textarea>
-				
-										<label class="fbr-bug-report__input-label" for="bug-file">Выберите файл для ожидаемого результата:</label>
-										<input class="fbr-bug-report__input-field" type="file" id="bug-file" name="bug-file">
-				
-										<button class="fbr-bug-report__submit-button" type="button">Отправить</button>
-								</div>
-								
-				</form>
-			</div>
+	<div class="fbr-plugin-layout">
+		<div class="fbr-plugin-balls">
 		</div>
 
-		<div class="fbr-plugin-container" id="pluginContainer">
-			<!-- кнопка активации режима комментирования -->
-			<div class="fbr-comment__togle" id="plugin-comment-togle" data-active="false">
-				
-				<div class="fbr-comment__switch">
-					<div class="fbr-comment__switch-togle">
-						<div class="fbr-comment__switch-icon-unact">
-							off
-						</div>
-						<div class="fbr-comment__switch-icon-act">
-							on
-						</div>
+		<div class="fbr-bug-report">
+			<form class="fbr-bug-report__form">
+				<!-- loader -->
+				<div class="fbr-loader" style="display: none;"></div>
+				<!-- Close button -->
+				<button class="fbr-bug-report__cancel-button" type="button">&times;</button>
+
+				<!-- Navigation tabs -->
+				<div class="fbr-bug-report__tabs">
+					<button class="fbr-bug-report__tab" data-step="1" disabled>Этап 1</button>
+					<button class="fbr-bug-report__tab " data-step="2" disabled>Этап 2</button>
+					<button class="fbr-bug-report__tab" data-step="3" disabled>Этап 3</button>
+					<button class="fbr-bug-report__tab" data-step="4" disabled>Этап 4</button>
+				</div>
+				<!-- Step 1 -->
+				<div class="fbr-bug-report__step" id="step-1">
+					<label class="fbr-bug-report__input-label" for="bug-title">Название бага:</label>
+					<input class="fbr-bug-report__input-field" type="text" id="bug-title" placeholder="Введите название бага">
+
+					<label class="fbr-bug-report__input-label" for="bug-priority">Приоритет:</label>
+					<select class="fbr-bug-report__select-field" id="bug-priority" name="bug-priority">
+						<option value="critical">Критичный</option>
+						<option value="normal" selected>Средний</option>
+						<option value="minor">Низкий</option>
+					</select>
+
+					<label class="fbr-bug-report__input-label" for="bug-executor">Исполнитель:</label>
+					<select class="fbr-bug-report__select-field" id="bug-executor" name="bug-executor">
+						<option value="frontend">Frontend</option>
+						<option value="backend">Backend</option>
+						<option value="both">Frontend и Backend</option>
+					</select>
+
+					<button class="fbr-bug-report__next-button" type="button" disabled>Далее</button>
+				</div>
+				<!-- Step 2 -->
+				<div class="fbr-bug-report__step" id="step-2" style="display:none;">
+					<label class="fbr-bug-report__input-label" for="bug-description">Описание бага:</label>
+					<textarea class="fbr-bug-report__textarea-field" id="bug-description"
+						placeholder="Введите описание бага"></textarea>
+
+					<button class="fbr-bug-report__next-button" type="button">Далее</button>
+				</div>
+
+				<!-- Step 3 -->
+				<div class="fbr-bug-report__step" id="step-3" style="display:none;">
+					<label class="fbr-bug-report__input-label" for="bug-actual">Фактический результат:</label>
+					<textarea class="fbr-bug-report__textarea-field" id="bug-actual"
+						placeholder="Введите описание фактического результата"></textarea>
+
+					<button class="fbr-bug-report__next-button" type="button">Далее</button>
+				</div>
+
+				<!-- Step 4 -->
+				<div class="fbr-bug-report__step" id="step-4" style="display:none;">
+					<label class="fbr-bug-report__input-label" for="bug-expected">Ожидаемый результат:</label>
+					<textarea class="fbr-bug-report__textarea-field" id="bug-expected"
+						placeholder="Введите описание ожидаемого результата"></textarea>
+
+					<label class="fbr-bug-report__input-label" for="bug-file">Выберите файл для ожидаемого результата:</label>
+					<input class="fbr-bug-report__input-field" type="file" id="bug-file" name="bug-file">
+
+					<button class="fbr-bug-report__submit-button" type="button">Отправить</button>
+				</div>
+
+			</form>
+		</div>
+	</div>
+
+	<div class="fbr-plugin-container" id="pluginContainer">
+		<!-- кнопка активации режима комментирования -->
+		<div class="fbr-comment__togle" id="plugin-comment-togle" data-active="false">
+
+			<div class="fbr-comment__switch">
+				<div class="fbr-comment__switch-togle">
+					<div class="fbr-comment__switch-icon-unact">
+						off
+					</div>
+					<div class="fbr-comment__switch-icon-act">
+						on
 					</div>
 				</div>
 			</div>
 		</div>
-		
-		<div class="blocks">
-			<div class="block">
-				Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus blanditiis vitae pariatur sit odit. Quod doloribus itaque explicabo voluptatum, consequatur ea eum magni quas maxime maiores placeat, eveniet quo animi.
-				<ul>
-					<li><a href="https://www.google.com/">Тестовая ссылка</a>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus provident eius.</li>
-					<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus provident eius.</li>
-					<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus provident eius.</li>
-					<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus provident eius.</li>
-				</ul>
+		<!-- кнопка открытия закрытия сайдбара -->
+		<div class="fbr-sidebar__toggle">
+			<button class="fbr-sidebar__toggle-btn" id="sidebarToggleBtn">
+				<img src="img/icons/sidebar-toggle.png" alt="">
+			</button>
+		</div>
+
+		<div class="fbr-sidebar" id="sidebar">
+			<div class="fbr-sidebar__header">
+
 			</div>
-	
-			<div class="block">
-				Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus blanditiis vitae pariatur sit odit. Quod doloribus itaque explicabo voluptatum, consequatur ea eum magni quas maxime maiores placeat, eveniet quo animi.
-				<ul>
-					<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus provident eius.</li>
-					<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus provident eius.</li>
-					<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus provident eius.</li>
-					<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus provident eius.</li>
-				</ul>
+			<div class="fbr-sidebar__tabs">
+				<button class="fbr-sidebar__tab sidebar__tab--active" data-tab="sidebar-tab1">Активные (0)</button>
+				<button class="fbr-sidebar__tab" data-tab="sidebar-tab2">Решеные (0)</button>
 			</div>
-			<div class="block">
-				Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus blanditiis vitae pariatur sit odit. Quod doloribus itaque explicabo voluptatum, consequatur ea eum magni quas maxime maiores placeat, eveniet quo animi.
+			<div class="fbr-sidebar__tab-content fbr-sidebar__tab-content--active" id="sidebar-tab1">
+				<div class="fbr-bug-container">
+				</div>
 			</div>
-	
-			<div class="block">
-				Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus blanditiis vitae pariatur sit odit. Quod doloribus itaque explicabo voluptatum, consequatur ea eum magni quas maxime maiores placeat, eveniet quo animi.
-			</div>
-			<div class="block">
-				Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus blanditiis vitae pariatur sit odit. Quod doloribus itaque explicabo voluptatum, consequatur ea eum magni quas maxime maiores placeat, eveniet quo animi.
-			</div>
-	
-			<div class="block">
-				Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus blanditiis vitae pariatur sit odit. Quod doloribus itaque explicabo voluptatum, consequatur ea eum magni quas maxime maiores placeat, eveniet quo animi.
+			<div class="fbr-sidebar__tab-content" id="sidebar-tab2">
+				<div class="fbr-bug-container">
+					<span>Контент для Таба 2</span>
+				</div>
 			</div>
 		</div>
-		
-		<script src="./js/index.bundle.js"></script>
-	</body>
+
+		<div class="fbr-sidebar" id="bug-sidebar">
+			<!-- HTML-код для сайдбара бага -->
+			<div class="fbr-bug-sidebar-content">
+				<!-- Здесь будет отображаться содержимое окна сайдбара для карточки бага -->
+			</div>
+		</div>
+
+	</div>
+
+	<div class="blocks">
+		<div class="block">
+			Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus blanditiis vitae pariatur sit odit. Quod
+			doloribus itaque explicabo voluptatum, consequatur ea eum magni quas maxime maiores placeat, eveniet quo animi.
+			<ul>
+				<li><a href="https://www.google.com/">Тестовая ссылка</a>Lorem ipsum dolor sit amet consectetur adipisicing
+					elit. Possimus temporibus odit voluptates dolorum voluptatibus optio quas nihil cum fugiat ipsam distinctio
+					quam, doloremque adipisci autem ut. Laborum natus provident eius.</li>
+				<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum
+					voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus
+					provident eius.</li>
+				<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum
+					voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus
+					provident eius.</li>
+				<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum
+					voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus
+					provident eius.</li>
+			</ul>
+		</div>
+
+		<div class="block">
+			Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus blanditiis vitae pariatur sit odit. Quod
+			doloribus itaque explicabo voluptatum, consequatur ea eum magni quas maxime maiores placeat, eveniet quo animi.
+			<ul>
+				<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum
+					voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus
+					provident eius.</li>
+				<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum
+					voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus
+					provident eius.</li>
+				<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum
+					voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus
+					provident eius.</li>
+				<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum
+					voluptatibus optio quas nihil cum fugiat ipsam distinctio quam, doloremque adipisci autem ut. Laborum natus
+					provident eius.</li>
+			</ul>
+		</div>
+		<div class="block">
+			Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus blanditiis vitae pariatur sit odit. Quod
+			doloribus itaque explicabo voluptatum, consequatur ea eum magni quas maxime maiores placeat, eveniet quo animi.
+		</div>
+
+		<div class="block">
+			Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus blanditiis vitae pariatur sit odit. Quod
+			doloribus itaque explicabo voluptatum, consequatur ea eum magni quas maxime maiores placeat, eveniet quo animi.
+		</div>
+		<div class="block">
+			Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus blanditiis vitae pariatur sit odit. Quod
+			doloribus itaque explicabo voluptatum, consequatur ea eum magni quas maxime maiores placeat, eveniet quo animi.
+		</div>
+
+		<div class="block">
+			Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus blanditiis vitae pariatur sit odit. Quod
+			doloribus itaque explicabo voluptatum, consequatur ea eum magni quas maxime maiores placeat, eveniet quo animi.
+		</div>
+	</div>
+
+	<script src="./js/index.bundle.js"></script>
+</body>
+
 </html>

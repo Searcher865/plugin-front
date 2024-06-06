@@ -1,5 +1,6 @@
 import { BugData } from './bugData';
 import { DataCollector } from './dataCollector';
+import config from '../config.js';
 
 export class BugMarks {
 

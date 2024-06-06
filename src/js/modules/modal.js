@@ -3,6 +3,7 @@ import { BugMarks } from './bugMarks';
 // import { BugList } from './bugList';
 import { BugData } from './bugData';
 import { createPluginBall } from "./createBall";
+import config from '../config.js';
 
 
 
@@ -313,7 +314,7 @@ export class ModalHandler {
         try {
             this.showLoader()
             this.submitButton.style.visibility = 'hidden'; // Скрываем кнопку "Отправить"
-            const apiUrl = 'http://localhost:3000/api/bug';
+            const apiUrl = `${config.apiUrl}/bug`;
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 body: this.formData,
