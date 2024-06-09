@@ -1,8 +1,9 @@
 import { DataCollector } from './dataCollector';
 import { BugMarks } from './bugMarks';
-// import { BugList } from './bugList';
+import { BugList } from './bugList';
 import { BugData } from './bugData';
 import { createPluginBall } from "./createBall";
+import { BugSidebar } from "./bugSidebar";
 import config from '../config.js';
 
 
@@ -13,7 +14,7 @@ export class ModalHandler {
         this.formData = new FormData();
         this.bugData = new BugData();
         this.bugMarks = new BugMarks();
-        // this.bugList = new BugList();
+        this.bugList = new BugList();
 
         this.modalElement = document.querySelector('.fbr-bug-report');
         this.cancelButton = this.modalElement.querySelector('.fbr-bug-report__cancel-button');
@@ -25,7 +26,7 @@ export class ModalHandler {
         this.inputExpectedResult = document.querySelector('#bug-expected');
         this.bugFileInput = document.getElementById('bug-file');
         this.selectedPriority = document.getElementById('bug-priority');
-        this.selectedExecutor = document.getElementById('bug-executor');
+        this.selectedTags = document.getElementById('bug-tags');
         // Находим все элементы с классом .fbr-bug-report__step
         this.steps = document.querySelectorAll('.fbr-bug-report__step');
         // Находим все элементы с классом .fbr-bug-report__tab
@@ -304,7 +305,7 @@ export class ModalHandler {
         this.addToFormData("actualResult", this.inputActualResult.value)
         this.addToFormData("expectedResult", this.inputExpectedResult.value)
         this.addToFormData("priority", this.selectedPriority.value)
-        this.addToFormData("executor", this.selectedExecutor.value)
+        this.addToFormData("tags", this.selectedTags.value)
 
 
 
@@ -338,8 +339,9 @@ export class ModalHandler {
             this.pluginContainer.style.display = 'block';
             this.pluginContainer.style.setProperty('display', 'block', 'important');
             this.bugMarks.renderBugMark()
-            /*     this.bugList.renderBugList() */
+            this.bugList.renderBugList()
             this.clearFormFields()
+            new BugSidebar()
         } catch (error) {
             console.error('Произошла ошибка:', error);
             alert(`Отсутствует соединение с сервером `+error);

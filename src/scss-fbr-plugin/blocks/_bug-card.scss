@@ -20,7 +20,7 @@
         border: 2px solid #fff !important;
         background: #2ea2f6 !important;
         margin-right: 5px !important;
-        font-family: Gordita-Medium !important;
+        font-family: "Poppins", sans-serif !important;
         font-weight: 500 !important;
         border-radius: 100% !important;
         display: flex !important;
@@ -32,7 +32,7 @@
     &__author {
         flex-grow: 1 !important; /* Занимает оставшееся место в строке */
         margin-right: 10px !important;
-        font-family: Gordita-Medium !important;
+        font-family: "Poppins", sans-serif !important;
         font-weight: 500 !important;
         font-size: 12px !important;
         line-height: 20px !important;
@@ -43,14 +43,14 @@
         font-size: 10px !important;
         line-height: 20px !important;
         color: #778aa7 !important;
-        font-family: Gordita-Medium !important;
+        font-family: "Poppins", sans-serif !important;
         font-weight: 500 !important;
         z-index: 2147483600 !important;
     }
     &__title {
         font-size: 12px !important;
         line-height: 18px !important;
-        font-family: Manrope-SemiBold !important;
+        font-family: "Poppins", sans-serif !important;
         font-weight: 600 !important;
         color: #303d4e !important;
         z-index: 2147483600 !important;

@@ -69,12 +69,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _dataCollector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var _bugMarks__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
-/* harmony import */ var _bugData__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6);
-/* harmony import */ var _createBall__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(8);
-/* harmony import */ var _config_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
+/* harmony import */ var _bugList__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8);
+/* harmony import */ var _bugData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
+/* harmony import */ var _createBall__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(9);
+/* harmony import */ var _bugSidebar__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(10);
+/* harmony import */ var _config_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(7);
 
 
-// import { BugList } from './bugList';
+
+
 
 
 
@@ -85,9 +88,9 @@ class ModalHandler {
     constructor() {
         this.dataCollector = new _dataCollector__WEBPACK_IMPORTED_MODULE_0__.DataCollector();
         this.formData = new FormData();
-        this.bugData = new _bugData__WEBPACK_IMPORTED_MODULE_2__.BugData();
+        this.bugData = new _bugData__WEBPACK_IMPORTED_MODULE_3__.BugData();
         this.bugMarks = new _bugMarks__WEBPACK_IMPORTED_MODULE_1__.BugMarks();
-        // this.bugList = new BugList();
+        this.bugList = new _bugList__WEBPACK_IMPORTED_MODULE_2__.BugList();
 
         this.modalElement = document.querySelector('.fbr-bug-report');
         this.cancelButton = this.modalElement.querySelector('.fbr-bug-report__cancel-button');
@@ -99,7 +102,7 @@ class ModalHandler {
         this.inputExpectedResult = document.querySelector('#bug-expected');
         this.bugFileInput = document.getElementById('bug-file');
         this.selectedPriority = document.getElementById('bug-priority');
-        this.selectedExecutor = document.getElementById('bug-executor');
+        this.selectedTags = document.getElementById('bug-tags');
         // Находим все элементы с классом .fbr-bug-report__step
         this.steps = document.querySelectorAll('.fbr-bug-report__step');
         // Находим все элементы с классом .fbr-bug-report__tab
@@ -185,7 +188,7 @@ class ModalHandler {
                 this.addToFormData("heightRatio", heightRatio)
                 this.addToFormData("widthRatio", widthRatio)
 
-                ;(0,_createBall__WEBPACK_IMPORTED_MODULE_3__.createPluginBall)(xRelatively, yRelatively, xpath, document.querySelector('.fbr-plugin-balls'));
+                ;(0,_createBall__WEBPACK_IMPORTED_MODULE_4__.createPluginBall)(xRelatively, yRelatively, xpath, document.querySelector('.fbr-plugin-balls'));
                 const dataUrl = await this.dataCollector.makeScreenshot();
                 const dataBlob = this.dataURLToBlob(dataUrl)
 
@@ -378,7 +381,7 @@ class ModalHandler {
         this.addToFormData("actualResult", this.inputActualResult.value)
         this.addToFormData("expectedResult", this.inputExpectedResult.value)
         this.addToFormData("priority", this.selectedPriority.value)
-        this.addToFormData("executor", this.selectedExecutor.value)
+        this.addToFormData("tags", this.selectedTags.value)
 
 
 
@@ -388,7 +391,7 @@ class ModalHandler {
         try {
             this.showLoader()
             this.submitButton.style.visibility = 'hidden'; // Скрываем кнопку "Отправить"
-            const apiUrl = `${_config_js__WEBPACK_IMPORTED_MODULE_4__["default"].apiUrl}/bug`;
+            const apiUrl = `${_config_js__WEBPACK_IMPORTED_MODULE_6__["default"].apiUrl}/bug`;
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 body: this.formData,
@@ -412,8 +415,9 @@ class ModalHandler {
             this.pluginContainer.style.display = 'block';
             this.pluginContainer.style.setProperty('display', 'block', 'important');
             this.bugMarks.renderBugMark()
-            /*     this.bugList.renderBugList() */
+            this.bugList.renderBugList()
             this.clearFormFields()
+            new _bugSidebar__WEBPACK_IMPORTED_MODULE_5__.BugSidebar()
         } catch (error) {
             console.error('Произошла ошибка:', error);
             alert(`Отсутствует соединение с сервером `+error);
@@ -8467,12 +8471,14 @@ class BugMarks {
         const ball = document.createElement("div");
         ball.classList.add("fbr-plugin-ball");
         ball.innerHTML = `
-            <div class="fbr-plugin-ball__number">${bug.bugNumber}</div>
+           
+            <div class="fbr-plugin-ball__number"><a href="https://tracker.yandex.ru/TESTFORPLUGIN-237" target="_blank">${bug.bugNumber}</a></div>
+         
             <div class="fbr-plugin-ball__peek">
                 <div class="fbr-plugin-ball__inner">
-                    <div class="fbr-plugin-ball__author">${bug.taskKey}</div>
-                    <div class="fbr-plugin-ball__date">${bug.OSVersion}</div>
-                    <div class="fbr-plugin-ball__title">${bug.summary}</div>
+                    <div class="fbr-plugin-ball__summary">${bug.summary}</div>
+                    <div class="fbr-plugin-ball__finalOsVersion">${bug.finalOsVersion}</div>
+                    <div class="fbr-plugin-ball__browser">${bug.browser}</div>
                 </div>
             </div>
         `;
@@ -8532,7 +8538,7 @@ class BugMarks {
   }
 
   async getResponseBugsMarks() {
-    const url = new URL('http://localhost:3000/api/bugs');
+    const url = new URL(`${_config_js__WEBPACK_IMPORTED_MODULE_2__["default"].apiUrl}/bugs`);
     const urlPage = this.dataCollector.getCurrentURL()
     url.searchParams.append('url', urlPage);
   
@@ -8606,6 +8612,80 @@ const config = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   BugList: function() { return /* binding */ BugList; }
+/* harmony export */ });
+/* harmony import */ var _bugData__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
+/* harmony import */ var _dataCollector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
+
+
+
+class BugList {
+
+  constructor() {
+    this.bugData = new _bugData__WEBPACK_IMPORTED_MODULE_0__.BugData();
+    this.dataCollector = new _dataCollector__WEBPACK_IMPORTED_MODULE_1__.DataCollector();
+  }
+
+  renderBugList() {
+    const bugListElement = document.querySelector('.fbr-bug-container');
+
+    // Очищаем текущий список багов
+    bugListElement.innerHTML = '';
+
+    // Перебираем массив багов и создаем элементы для отображения каждого бага
+    this.bugData.bugs.forEach((bug, index) => {
+        // Создаем ваш элемент "ball" для каждого бага
+        const ball = document.createElement("div");
+        ball.classList.add(".fbr-bug-container");
+        ball.innerHTML = `
+            <div class="fbr-bug-card">
+            <div class="fbr-bug-card__header">
+              <div class="fbr-bug-card__number">${bug.bugNumber}</div>
+              <div class="fbr-bug-card__author">Lil Pump</div>
+              <div class="fbr-bug-card__date">29.12.23</div>
+            </div>
+            <div class="fbr-bug-card__title">${bug.summary}</div>
+          </div>
+        `;
+
+        // Добавляем элемент "bug" в контейнер
+        bugListElement.appendChild(ball);
+    });
+  }
+
+  async getResponseBugsList() {
+    const url = new URL('http://localhost:3000/api/bugs');
+    const urlPage = this.dataCollector.getCurrentURL()
+    url.searchParams.append('url', urlPage);
+  
+    try {
+      // Отправляем GET-запрос
+      const response = await fetch(url);
+  
+      if (!response.ok) {
+        throw new Error(`Network response was not ok: ${response.status}`);
+      }
+  
+      // Распарсим JSON-ответ
+      const data = await response.json();
+      console.log('Ответ сервера:', data);
+      this.bugData.setBugs(data)
+      this.renderBugList()
+    } catch (error) {
+      console.error('Произошла ошибка:', error);
+    }
+}
+
+
+}  
+
+/***/ }),
+/* 9 */
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   createPluginBall: function() { return /* binding */ createPluginBall; }
 /* harmony export */ });
 // Функция, которая создает новый элемент с классом plugin-ball
@@ -8623,12 +8703,12 @@ function createPluginBall(xRelatively, yRelatively, xPath, container) {
         ball.classList.add("fbr-plugin-ball");
         ball.classList.add("fbr-plugin-new-ball");
         ball.innerHTML = `
-            <div class="fbr-plugin-ball__number"></div>
+            <div class="fbr-plugin-ball__number"><a></a></div>
             <div class="fbr-plugin-ball__peek">
                 <div class="fbr-plugin-ball__inner">
-                    <div class="fbr-plugin-ball__author"></div>
-                    <div class="fbr-plugin-ball__date"></div>
-                    <div class="fbr-plugin-ball__title"></div>
+                    <div class="fbr-plugin-ball__summary"></div>
+                    <div class="fbr-plugin-ball__finalOsVersion"></div>
+                    <div class="fbr-plugin-ball__browser"></div>
                 </div>
             </div>
         `;
@@ -8645,7 +8725,68 @@ function createPluginBall(xRelatively, yRelatively, xPath, container) {
 }
 
 /***/ }),
-/* 9 */
+/* 10 */
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   BugSidebar: function() { return /* binding */ BugSidebar; }
+/* harmony export */ });
+
+
+class BugSidebar {
+    constructor() {
+
+            // Получаем сайдбар бага
+            this.bugSidebar = document.getElementById('bug-sidebar');
+
+            // Получаем ссылки на все карточки багов
+            this.bugCards = document.querySelectorAll('.fbr-bug-card');
+            this.openBugCard()
+            this.closeBugCard()
+    }
+    openBugCard() {
+        // Обработчик клика для каждой карточки бага
+        this.bugCards.forEach((bugCard, index) => {
+            bugCard.addEventListener('click', () => {
+                console.log("ТЫК2 ТЫКУ2 ТЫУ2");
+                // Создаем содержимое для окна сайдбара бага на основе данных карточки бага
+                const bugTitle = bugCard.querySelector('.fbr-bug-card__title').textContent;
+                const bugDetails = bugCard.querySelectorAll('p');
+
+                // Генерируем HTML-содержимое для окна сайдбара бага
+                let sidebarContent = `
+                            <button id="closeBugButton"><img class="fbr-bug-sidebar__close-icon" src="img/icons/sidebar-close.png"></button>
+                            <h2>${bugTitle}</h2>`;
+                bugDetails.forEach((detail) => {
+                    sidebarContent += `<p>${detail.textContent}</p>`;
+                });
+
+                // Устанавливаем содержимое окна сайдбара бага
+                this.bugSidebar.querySelector('.fbr-bug-sidebar-content').innerHTML = sidebarContent;
+
+                // Открываем сайдбар бага
+                this.bugSidebar.classList.add('bug-sidebar-open');
+                this.bugSidebar.classList.add('fbr-sidebar--active');
+            });
+        });
+
+    }
+    closeBugCard() {
+        this.bugSidebar.addEventListener('click', (event) => {
+            // Проверяем, была ли нажата кнопка closeBugButton
+            if (event.target.id === 'closeBugButton') {
+                // Закрываем сайдбар бага, устанавливая left в '-282px'
+                this.bugSidebar.classList.remove('fbr-sidebar--active');
+            }
+        });
+    }
+
+}
+
+/***/ }),
+/* 11 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8682,16 +8823,18 @@ function frontendPlugin() {
 
 					<label class="fbr-bug-report__input-label" for="bug-priority">Приоритет:</label>
 					<select class="fbr-bug-report__select-field" id="bug-priority" name="bug-priority">
-						<option value="critical">Критичный</option>
-						<option value="normal" selected="">Средний</option>
-						<option value="minor">Низкий</option>
+						<option value="5">Блокер</option>
+						<option value="4">Критичный</option>
+						<option value="3" selected="">Средний</option>
+						<option value="2">Низкий</option>
+						<option value="1">Незначительный</option>
 					</select>
 
-					<label class="fbr-bug-report__input-label" for="bug-executor">Исполнитель:</label>
-					<select class="fbr-bug-report__select-field" id="bug-executor" name="bug-executor">
-						<option value="frontend">Frontend</option>
-						<option value="backend">Backend</option>
-						<option value="both">Frontend и Backend</option>
+					<label class="fbr-bug-report__input-label" for="bug-tags">Исполнитель:</label>
+					<select class="fbr-bug-report__select-field" id="bug-tags" name="bug-tags">
+						<option value="Frontend">Frontend</option>
+						<option value="Backend">Backend</option>
+						<option value="Both">Frontend и Backend</option>
 					</select>
 
 					<button class="fbr-bug-report__next-button" type="button" disabled="">Далее</button>
@@ -8742,8 +8885,8 @@ function frontendPlugin() {
 		</div>
 		<!-- кнопка открытия закрытия сайдбара -->
 		<div class="fbr-sidebar__toggle">
-			<button class="fbr-sidebar__toggle-btn" id="sidebarToggleBtn">
-				<img src="img/icons/sidebar-toggle.png" alt="">
+			<button class="fbr-sidebar__toggle-btn" id="fbr-sidebarToggleBtn">
+				<!--?xml version="1.0" ?--><svg fill="none" height="26" viewBox="0 0 27 26" width="27" xmlns="http://www.w3.org/2000/svg"><path d="M22 1H4.89999C2.79999 1 1.10001 2.70815 1.10001 4.81823V17.2778C1.10001 19.3878 2.79999 21.096 4.89999 21.096H14.8C15.2 21.096 15.5 21.1965 15.8 21.4979L19.1 24.8138C19.5 25.2157 20.1 24.9142 20.1 24.4118V22.5027C20.1 21.6989 20.7 21.096 21.5 21.096H22C24.1 21.096 25.8 19.3878 25.8 17.2778V4.81823C25.8 2.70815 24.1 1 22 1Z" stroke="#4F4F4F" stroke-miterlimit="10" stroke-width="2"></path><path d="M7.39999 13.56C8.39411 13.56 9.2 12.7503 9.2 11.7514C9.2 10.7525 8.39411 9.94275 7.39999 9.94275C6.40588 9.94275 5.60001 10.7525 5.60001 11.7514C5.60001 12.7503 6.40588 13.56 7.39999 13.56Z" fill="#4F4F4F"></path><path d="M13.5 13.56C14.4941 13.56 15.3 12.7503 15.3 11.7514C15.3 10.7525 14.4941 9.94275 13.5 9.94275C12.5059 9.94275 11.7 10.7525 11.7 11.7514C11.7 12.7503 12.5059 13.56 13.5 13.56Z" fill="#4F4F4F"></path><path d="M19.5 13.56C20.4941 13.56 21.3 12.7503 21.3 11.7514C21.3 10.7525 20.4941 9.94275 19.5 9.94275C18.5059 9.94275 17.7 10.7525 17.7 11.7514C17.7 12.7503 18.5059 13.56 19.5 13.56Z" fill="#4F4F4F"></path></svg>
 			</button>
 		</div>
 
@@ -8812,7 +8955,7 @@ function frontendPlugin() {
   border: 2px solid #fff !important;
   background: #2ea2f6 !important;
   margin-right: 5px !important;
-  font-family: Gordita-Medium !important;
+  font-family: "Poppins", sans-serif !important;
   font-weight: 500 !important;
   border-radius: 100% !important;
   display: flex !important;
@@ -8824,7 +8967,7 @@ function frontendPlugin() {
 .fbr-bug-card__author {
   flex-grow: 1 !important; /* Занимает оставшееся место в строке */
   margin-right: 10px !important;
-  font-family: Gordita-Medium !important;
+  font-family: "Poppins", sans-serif !important;
   font-weight: 500 !important;
   font-size: 12px !important;
   line-height: 20px !important;
@@ -8835,14 +8978,14 @@ function frontendPlugin() {
   font-size: 10px !important;
   line-height: 20px !important;
   color: #778aa7 !important;
-  font-family: Gordita-Medium !important;
+  font-family: "Poppins", sans-serif !important;
   font-weight: 500 !important;
   z-index: 2147483600 !important;
 }
 .fbr-bug-card__title {
   font-size: 12px !important;
   line-height: 18px !important;
-  font-family: Manrope-SemiBold !important;
+  font-family: "Poppins", sans-serif !important;
   font-weight: 600 !important;
   color: #303d4e !important;
   z-index: 2147483600 !important;
@@ -8876,7 +9019,7 @@ function frontendPlugin() {
   font-size: 14px !important;
   line-height: 20px !important;
   color: #778aa7 !important;
-  font-family: Gordita-Medium !important;
+  font-family: "Poppins", sans-serif !important;
   font-weight: 500 !important;
   z-index: 2147483600 !important;
   position: relative !important;
@@ -9099,7 +9242,7 @@ function frontendPlugin() {
   cursor: pointer !important;
   z-index: 2147483600 !important;
 }
-.fbr-plugin-ball__number {
+.fbr-plugin-ball__number a {
   position: absolute !important;
   width: 38px !important;
   height: 38px !important;
@@ -9108,9 +9251,8 @@ function frontendPlugin() {
   border: 3px solid #fff !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
   border-radius: 50% !important;
-  font-size: 16px !important;
-  font-family: Gordita-Bold !important;
-  font-weight: 700 !important;
+  font-size: 15px !important;
+  font-family: "Poppins", sans-serif !important;
   color: #fff !important;
   background: #2ea2f6 !important;
   z-index: 2147483600 !important;
@@ -9119,23 +9261,29 @@ function frontendPlugin() {
   display: none !important;
   z-index: 2147483600 !important;
 }
+.fbr-plugin-ball__summary {
+  font-size: 13px !important;
+}
 
 .fbr-plugin-ball__number:hover + .fbr-plugin-ball__peek .fbr-plugin-ball__inner {
   display: block !important; /* Отображение элемента при наведении на .plugin-ball__number */
   position: absolute !important;
-  top: 2px !important;
+  top: 1px !important;
   left: 0px !important;
   width: 260px !important;
   padding-left: 42px !important;
   background: #fff !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
-  border-radius: 60px !important;
+  border-top-right-radius: 60px !important;
+  border-bottom-right-radius: 60px !important;
+  border-top-left-radius: 80px !important;
+  border-bottom-left-radius: 100px !important;
   overflow: hidden !important;
   transition: transform 0.12s ease, opacity 0.15s ease !important;
   pointer-events: none !important;
   transform-origin: left !important;
   font-size: 10px !important;
-  z-index: 2147483601 !important;
+  z-index: 2147483599 !important;
 }
 
 .fbr-plugin-container {
@@ -9213,7 +9361,7 @@ function frontendPlugin() {
   text-align: center !important;
   transition: all 0.15s ease !important;
   position: relative !important;
-  font-family: Gordita-Medium !important;
+  font-family: "Poppins", sans-serif !important;
   font-weight: 500 !important;
   cursor: pointer !important;
   background: transparent !important;
@@ -9274,11 +9422,73 @@ function frontendPlugin() {
 .fbr-sidebar::-webkit-scrollbar-thumb:hover {
   background-color: #555 !important;
   z-index: 2147483600 !important;
+}
+
+@media only screen and (max-width: 768px) {
+  .fbr-sidebar--active {
+    width: 100% !important;
+  }
 }`;
   style.appendChild(document.createTextNode(css));
   document.head.appendChild(style);
 }
 
+
+/***/ }),
+/* 12 */
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Sidebar: function() { return /* binding */ Sidebar; }
+/* harmony export */ });
+class Sidebar {
+    constructor() {
+        this.sidebarToggleBtn = document.getElementById("fbr-sidebarToggleBtn");
+        this.sidebar = document.getElementById("sidebar");
+
+        // Табы в сайдбаре
+        this.tabButtons = document.querySelectorAll(".fbr-sidebar__tab");
+        this.tabContents = document.querySelectorAll(".fbr-sidebar__tab-content");
+
+        // Вызов метода для открытия сайдбара
+        this.openSidebar();
+        this.openScreenSidebar()
+
+    }
+
+    openSidebar() {
+        this.sidebarToggleBtn.addEventListener("click", () => {
+            this.sidebar.classList.toggle('fbr-sidebar--active');
+        });
+    }
+
+ openScreenSidebar() {
+    this.tabButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+        console.log("Убираем класс");
+        // Убираем активный класс у всех вкладок и контента
+        this.tabButtons.forEach((btn) => btn.classList.remove("fbr-sidebar__tab--active"));
+        this.tabContents.forEach((content) => content.classList.remove("fbr-sidebar__tab-content--active"));
+
+        // Добавляем активный класс к выбранной вкладке и соответствующему контенту
+        const tabId = button.getAttribute("data-tab");
+        const tabContent = document.getElementById(tabId);
+
+        button.classList.add("fbr-sidebar__tab--active");
+        tabContent.classList.add("fbr-sidebar__tab-content--active");
+    });
+    });
+
+    // // Получаем ссылки на основной сайдбар и сайдбар бага
+    // const bugSidebar = document.getElementById('bug-sidebar');
+
+    // // Получаем ссылки на все карточки багов
+    // const bugCards = document.querySelectorAll('.fbr-bug-card');
+
+}
+}
 
 /***/ })
 /******/ 	]);
@@ -9357,11 +9567,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_toggleComment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 /* harmony import */ var _modules_modal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
 /* harmony import */ var _modules_bugMarks__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(5);
-/* harmony import */ var _modules_frontendPlugin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(9);
+/* harmony import */ var _modules_frontendPlugin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(11);
+/* harmony import */ var _modules_sidebar__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(12);
+/* harmony import */ var _modules_bugSidebar__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(10);
+/* harmony import */ var _modules_bugList__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(8);
 
  // Импорт класса ModalHandler
 
  // Импорт фронтенда
+
+
+
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -9369,8 +9585,13 @@ if (urlParams.has('fbr')) {
   
 (0,_modules_frontendPlugin__WEBPACK_IMPORTED_MODULE_3__.frontendPlugin)();
 const modalHandler = new _modules_modal__WEBPACK_IMPORTED_MODULE_1__.ModalHandler();
+const sidebar = new _modules_sidebar__WEBPACK_IMPORTED_MODULE_4__.Sidebar();
+const bugList = new _modules_bugList__WEBPACK_IMPORTED_MODULE_6__.BugList();
 const toggleCommentHandler = new _modules_toggleComment__WEBPACK_IMPORTED_MODULE_0__.ToggleCommentHandler();
+
 modalHandler.setupStepNavigation()
+
+
 
 
 document.addEventListener('mouseover', function(event) {
@@ -9398,8 +9619,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const bugMarks = new _modules_bugMarks__WEBPACK_IMPORTED_MODULE_2__.BugMarks();
 
   await bugMarks.getResponseBugsMarks()
-
-
+  await bugList.getResponseBugsList();
+  const bugSidebar = new _modules_bugSidebar__WEBPACK_IMPORTED_MODULE_5__.BugSidebar();
 
   let resizeTimer;
 

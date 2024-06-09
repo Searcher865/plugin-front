@@ -21,12 +21,14 @@ export class BugMarks {
         const ball = document.createElement("div");
         ball.classList.add("fbr-plugin-ball");
         ball.innerHTML = `
-            <div class="fbr-plugin-ball__number">${bug.bugNumber}</div>
+           
+            <div class="fbr-plugin-ball__number"><a href="https://tracker.yandex.ru/TESTFORPLUGIN-237" target="_blank">${bug.bugNumber}</a></div>
+         
             <div class="fbr-plugin-ball__peek">
                 <div class="fbr-plugin-ball__inner">
-                    <div class="fbr-plugin-ball__author">${bug.taskKey}</div>
-                    <div class="fbr-plugin-ball__date">${bug.OSVersion}</div>
-                    <div class="fbr-plugin-ball__title">${bug.summary}</div>
+                    <div class="fbr-plugin-ball__summary">${bug.summary}</div>
+                    <div class="fbr-plugin-ball__finalOsVersion">${bug.finalOsVersion}</div>
+                    <div class="fbr-plugin-ball__browser">${bug.browser}</div>
                 </div>
             </div>
         `;

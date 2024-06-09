@@ -2,6 +2,9 @@ import { ToggleCommentHandler } from "./modules/toggleComment";
 import { ModalHandler } from './modules/modal'; // Импорт класса ModalHandler
 import { BugMarks } from './modules/bugMarks';
 import { frontendPlugin } from './modules/frontendPlugin'; // Импорт фронтенда
+import { Sidebar } from "./modules/sidebar";
+import { BugSidebar } from "./modules/bugSidebar";
+import { BugList } from './modules/bugList';
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -9,8 +12,13 @@ if (urlParams.has('fbr')) {
   
 frontendPlugin();
 const modalHandler = new ModalHandler();
+const sidebar = new Sidebar();
+const bugList = new BugList();
 const toggleCommentHandler = new ToggleCommentHandler();
+
 modalHandler.setupStepNavigation()
+
+
 
 
 document.addEventListener('mouseover', function(event) {
@@ -38,8 +46,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const bugMarks = new BugMarks();
 
   await bugMarks.getResponseBugsMarks()
-
-
+  await bugList.getResponseBugsList();
+  const bugSidebar = new BugSidebar();
 
   let resizeTimer;
 

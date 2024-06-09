@@ -1,16 +1,31 @@
-import { BugList } from './bugList';
-import { BugData } from './bugData';
+export class Sidebar {
+    constructor() {
+        this.sidebarToggleBtn = document.getElementById("fbr-sidebarToggleBtn");
+        this.sidebar = document.getElementById("sidebar");
 
-export function sidebar() {
-    
-    const tabButtons = document.querySelectorAll(".fbr-sidebar__tab");
-    const tabContents = document.querySelectorAll(".fbr-sidebar__tab-content");
+        // Табы в сайдбаре
+        this.tabButtons = document.querySelectorAll(".fbr-sidebar__tab");
+        this.tabContents = document.querySelectorAll(".fbr-sidebar__tab-content");
 
-    tabButtons.forEach((button) => {
+        // Вызов метода для открытия сайдбара
+        this.openSidebar();
+        this.openScreenSidebar()
+
+    }
+
+    openSidebar() {
+        this.sidebarToggleBtn.addEventListener("click", () => {
+            this.sidebar.classList.toggle('fbr-sidebar--active');
+        });
+    }
+
+ openScreenSidebar() {
+    this.tabButtons.forEach((button) => {
     button.addEventListener("click", () => {
+        console.log("Убираем класс");
         // Убираем активный класс у всех вкладок и контента
-        tabButtons.forEach((btn) => btn.classList.remove("fbr-sidebar__tab--active"));
-        tabContents.forEach((content) => content.classList.remove("fbr-sidebar__tab-content--active"));
+        this.tabButtons.forEach((btn) => btn.classList.remove("fbr-sidebar__tab--active"));
+        this.tabContents.forEach((content) => content.classList.remove("fbr-sidebar__tab-content--active"));
 
         // Добавляем активный класс к выбранной вкладке и соответствующему контенту
         const tabId = button.getAttribute("data-tab");
@@ -21,23 +36,11 @@ export function sidebar() {
     });
     });
 
-
-    function toggleSidebar() {
-        const sidebarToggleBtn = document.getElementById("sidebarToggleBtn");
-        const sidebar = document.getElementById("sidebar");
-
-        sidebarToggleBtn.addEventListener("click", function () {
-            sidebar.classList.toggle('fbr-sidebar--active');
-        });
-    }
-    toggleSidebar();
-
-
-
     // // Получаем ссылки на основной сайдбар и сайдбар бага
     // const bugSidebar = document.getElementById('bug-sidebar');
 
     // // Получаем ссылки на все карточки багов
     // const bugCards = document.querySelectorAll('.fbr-bug-card');
 
+}
 }
