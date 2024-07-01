@@ -103,7 +103,6 @@ export class DataCollector {
             }).then(function (canvas) {
                 // Получаем данные из Canvas в формате Data URL (бинарные данные в виде строки)
                 const dataUrl = canvas.toDataURL('image/jpeg'); // Указываем формат изображения
-               
                 // Возвращаем Data URL
                 resolve(dataUrl);
             }).catch(reject);

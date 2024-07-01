@@ -1,3 +1,4 @@
+import { BugSidebar } from "./bugSidebar";
 export class Sidebar {
     constructor() {
         this.sidebarToggleBtn = document.getElementById("fbr-sidebarToggleBtn");
@@ -16,6 +17,7 @@ export class Sidebar {
     openSidebar() {
         this.sidebarToggleBtn.addEventListener("click", () => {
             this.sidebar.classList.toggle('fbr-sidebar--active');
+            this.bugSidebar = new BugSidebar()
         });
     }
 

@@ -17,6 +17,7 @@
 		</div>
 
 		<div class="fbr-bug-report">
+			
 			<form class="fbr-bug-report__form">
 				<!-- loader -->
 				<div class="fbr-loader" style="display: none;"></div>
@@ -32,6 +33,9 @@
 				</div>
 				<!-- Step 1 -->
 				<div class="fbr-bug-report__step" id="step-1">
+					<label class="fbr-bug-report__input-label" for="bug-parent">Родительская задача</label>
+					<input class="fbr-bug-report__input-field" type="text" id="bug-parent" placeholder="Родительская задача">
+
 					<label class="fbr-bug-report__input-label" for="bug-title">Название бага:</label>
 					<input class="fbr-bug-report__input-field" type="text" id="bug-title" placeholder="Введите название бага">
 
@@ -88,6 +92,29 @@
 	</div>
 
 	<div class="fbr-plugin-container" id="pluginContainer">
+
+
+		<div class="fbr-login-modal">
+			
+			<form class="fbr-login-modal__form">
+				<!-- loader -->
+				<div class="fbr-loader" style="display: none;"></div>
+				<!-- Close button -->
+				<button class="fbr-login-modal__cancel-button" type="button">&times;</button>
+
+				<div class="fbr-login-modal__step" id="step-1">
+					
+					<label class="fbr-login-modal__input-label" for="bug-email">Email:</label>
+					<input class="fbr-login-modal__input-field" type="text" id="bug-email" placeholder="Введите email">
+
+					<label class="fbr-login-modal__input-label" for="bug-password">Пароль:</label>
+					<input class="fbr-login-modal__input-field" type="text" id="bug-password" placeholder="Введите пароль">
+
+					<button class="fbr-login-modal__submit-button" type="button" disabled>Авторизоваться</button>
+				</div>
+			</form>
+		</div>
+
 		<!-- кнопка активации режима комментирования -->
 		<div class="fbr-comment__togle" id="plugin-comment-togle" data-active="false">
 
@@ -117,8 +144,29 @@
 				<button class="fbr-sidebar__tab sidebar__tab--active" data-tab="sidebar-tab1">Активные (0)</button>
 				<button class="fbr-sidebar__tab" data-tab="sidebar-tab2">Решеные (0)</button>
 			</div>
+			<div class="fbr-sidebar__tabs">
+				<div class="custom-section">
+					<label for="parent-task">Родительская задача</label>
+					<div class="custom-dropdown">
+							<input type="text" id="parent-task" placeholder="Введите или выберите...">
+							<ul id="task-list" class="dropdown-content">
+									<li>QA-1</li>
+									<li>QA-2</li>
+									<li>QA-3</li>
+							</ul>
+							<button id="apply-btn">Применить</button>
+					</div>
+			</div>
+			<div class="custom-section">
+					<label>
+							<input type="checkbox" id="all-pages">
+							Все страницы
+					</label>
+			</div>
+	</div>
 			<div class="fbr-sidebar__tab-content fbr-sidebar__tab-content--active" id="sidebar-tab1">
 				<div class="fbr-bug-container">
+					
 				</div>
 			</div>
 			<div class="fbr-sidebar__tab-content" id="sidebar-tab2">
@@ -138,11 +186,12 @@
 	</div>
 
 	<div class="blocks">
+
 		<div class="block">
 			Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus blanditiis vitae pariatur sit odit. Quod
 			doloribus itaque explicabo voluptatum, consequatur ea eum magni quas maxime maiores placeat, eveniet quo animi.
 			<ul>
-				<li><a href="https://www.google.com/">Тестовая ссылка</a>Lorem ipsum dolor sit amet consectetur adipisicing
+				<li><a href="./secondpage.html">ЭТО ССЫЛКА НА ВТОРУЮ СТРАНИЦУ</a>Lorem ipsum dolor sit amet consectetur adipisicing
 					elit. Possimus temporibus odit voluptates dolorum voluptatibus optio quas nihil cum fugiat ipsam distinctio
 					quam, doloremque adipisci autem ut. Laborum natus provident eius.</li>
 				<li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus temporibus odit voluptates dolorum

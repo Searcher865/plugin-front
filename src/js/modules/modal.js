@@ -5,6 +5,7 @@ import { BugData } from './bugData';
 import { createPluginBall } from "./createBall";
 import { BugSidebar } from "./bugSidebar";
 import config from '../config.js';
+import axios from 'axios';
 
 
 
@@ -20,6 +21,7 @@ export class ModalHandler {
         this.cancelButton = this.modalElement.querySelector('.fbr-bug-report__cancel-button');
         this.submitButton = this.modalElement.querySelector('.fbr-bug-report__submit-button');
         this.pluginContainer = document.getElementById('pluginContainer');
+        this.inputParent = document.querySelector('#bug-parent');
         this.inputSummary = document.querySelector('#bug-title');
         this.inputDescription = document.querySelector('#bug-description');
         this.inputActualResult = document.querySelector('#bug-actual');
@@ -35,6 +37,7 @@ export class ModalHandler {
         this.nextButtons = document.querySelectorAll('.fbr-bug-report__next-button');
         // Получаем ссылку на поле "Название бага"
         this.bugTitleInput = document.querySelector('#bug-title');
+        
 
         // Проверяем существование элемента с классом .fbr-bug-report
         if (!this.modalElement) {
@@ -114,12 +117,18 @@ export class ModalHandler {
 
                 createPluginBall(xRelatively, yRelatively, xpath, document.querySelector('.fbr-plugin-balls'));
                 const dataUrl = await this.dataCollector.makeScreenshot();
-                const dataBlob = this.dataURLToBlob(dataUrl)
-
-                this.addToFormData("actualScreenshot", dataBlob)
+/*                 const dataBlob = this.dataURLToBlob(dataUrl)
+                console.log("ВЫВОДИМ БЛОБ ИЗОБРАЖЕНИЯ "+ dataBlob); */
+                this.addToFormData("actualScreenshot", dataUrl)
 
                 this.modalElement.style.display = 'block'; //добавляем к модальному окну свойство display
                 this.modalElement.style.setProperty('display', 'block', 'important'); //добавляем к модальному окну свойство display
+
+                let parentKey = localStorage.getItem('parentKeyforFBR');
+                this.inputParent.value = parentKey;
+
+                         // Устанавливаем значение parentKey в поле ввода на модальном окне
+
                 //сдвигаем окно в сторону от клика
                 this.modalElement.style.left = xClick - 19 + 'px';
                 this.modalElement.style.top = yClick + 24 + 'px';
@@ -210,6 +219,9 @@ export class ModalHandler {
     }
 
     clearFormFields() {
+                // Очистка поля "Название бага"
+                this.inputParent.value = '';
+
         // Очистка поля "Название бага"
         this.inputSummary.value = '';
 
@@ -245,7 +257,6 @@ export class ModalHandler {
         this.clearFormFields()
 
         document.querySelector('.fbr-plugin-new-ball').remove();
-
 
         this.pluginContainer.style.display = 'block'
         this.pluginContainer.style.setProperty('display', 'block', 'important');
@@ -294,63 +305,66 @@ export class ModalHandler {
     }
 
     async sendBugReport() {
-
-        this.addToFormData("url", this.dataCollector.getCurrentURL())
-        this.addToFormData("OsVersion", await this.dataCollector.getOSVersion())
-        this.addToFormData("environment", this.dataCollector.getEnvironment())
-        this.addToFormData("pageResolution", this.dataCollector.getPageResolution())
-
-        this.addToFormData("summary", this.inputSummary.value)
-        this.addToFormData("description", this.inputDescription.value)
-        this.addToFormData("actualResult", this.inputActualResult.value)
-        this.addToFormData("expectedResult", this.inputExpectedResult.value)
-        this.addToFormData("priority", this.selectedPriority.value)
-        this.addToFormData("tags", this.selectedTags.value)
-
-
-
-        // for (const pair of this.formData.entries()) {
-        //     console.log(`1Ключ: ${pair[0]}, Значение: ${pair[1]}`);
-        // }
+        this.addToFormData("url", this.dataCollector.getCurrentURL());
+        this.addToFormData("OsVersion", await this.dataCollector.getOSVersion());
+        this.addToFormData("environment", this.dataCollector.getEnvironment());
+        this.addToFormData("pageResolution", this.dataCollector.getPageResolution());
+    
+        this.addToFormData("parentKeyForForm", this.inputParent.value);
+        this.addToFormData("summary", this.inputSummary.value);
+        this.addToFormData("description", this.inputDescription.value);
+        this.addToFormData("actualResult", this.inputActualResult.value);
+        this.addToFormData("expectedResult", this.inputExpectedResult.value);
+        this.addToFormData("priority", this.selectedPriority.value);
+        this.addToFormData("tags", this.selectedTags.value);
+    
         try {
-            this.showLoader()
+            this.showLoader();
             this.submitButton.style.visibility = 'hidden'; // Скрываем кнопку "Отправить"
+    
             const apiUrl = `${config.apiUrl}/bug`;
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                body: this.formData,
-            });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                alert(`Произошла ошибка: ${response.status}\nОтвет от сервера: ${JSON.stringify(data.message)}`);
-                throw new Error('Network response was not ok');
+            const token = localStorage.getItem('tokenFBR');
+            if (!token) {
+                throw new Error('Token is not available in localStorage');
             }
 
+            const response = await axios.post(apiUrl, this.formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                     'Authorization': `Bearer ${token}`
+                }
+            });
+    
+            const data = response.data.bugs;
+
+            const parentKey = response.data.parentKeyForForm;
+            console.log("ОТОБРАЖЕНИЕ parentKeyforFBR после отправки бага "+parentKeyforFBR);
+        localStorage.setItem('parentKeyforFBR', parentKeyforFBR);
 
             console.log('Ответ от сервера:', data);
-
-            this.bugData.setBugs(data)
-
+    
+            this.bugData.setBugs(data);
             this.formData = new FormData();
             this.modalElement.style.display = 'none';
             this.modalElement.style.setProperty('display', 'none', 'important');
             this.pluginContainer.style.display = 'block';
             this.pluginContainer.style.setProperty('display', 'block', 'important');
-            this.bugMarks.renderBugMark()
-            this.bugList.renderBugList()
-            this.clearFormFields()
-            new BugSidebar()
+            this.bugMarks.renderBugMark();
+            this.bugList.renderBugList();
+            this.clearFormFields();
+            new BugSidebar();
         } catch (error) {
             console.error('Произошла ошибка:', error);
-            alert(`Отсутствует соединение с сервером `+error);
+            if (error.response) {
+                alert(`Произошла ошибка: ${error.response.status}\nОтвет от сервера: ${JSON.stringify(error.response.data.message)}`);
+            } else {
+                alert(`Отсутствует соединение с сервером: ${error.message}`);
+            }
         } finally {
             this.hideLoader(); // Скрыть лоадер после получения ответа от сервера
             this.submitButton.style.visibility = 'visible'; // Восстанавливаем кнопку "Отправить"
-
         }
     }
-
 }
 

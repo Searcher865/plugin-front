@@ -7,6 +7,7 @@ export function frontendPlugin() {
 		</div>
 
 		<div class="fbr-bug-report">
+			
 			<form class="fbr-bug-report__form">
 				<!-- loader -->
 				<div class="fbr-loader" style="display: none;"></div>
@@ -22,6 +23,9 @@ export function frontendPlugin() {
 				</div>
 				<!-- Step 1 -->
 				<div class="fbr-bug-report__step" id="step-1">
+					<label class="fbr-bug-report__input-label" for="bug-parent">Родительская задача</label>
+					<input class="fbr-bug-report__input-field" type="text" id="bug-parent" placeholder="Родительская задача">
+
 					<label class="fbr-bug-report__input-label" for="bug-title">Название бага:</label>
 					<input class="fbr-bug-report__input-field" type="text" id="bug-title" placeholder="Введите название бага">
 
@@ -73,6 +77,29 @@ export function frontendPlugin() {
 			</form>
 		</div>
 	</div><div class="fbr-plugin-container" id="pluginContainer">
+
+
+		<div class="fbr-login-modal">
+			
+			<form class="fbr-login-modal__form">
+				<!-- loader -->
+				<div class="fbr-loader" style="display: none;"></div>
+				<!-- Close button -->
+				<button class="fbr-login-modal__cancel-button" type="button">×</button>
+
+				<div class="fbr-login-modal__step" id="step-1">
+					
+					<label class="fbr-login-modal__input-label" for="bug-email">Email:</label>
+					<input class="fbr-login-modal__input-field" type="text" id="bug-email" placeholder="Введите email">
+
+					<label class="fbr-login-modal__input-label" for="bug-password">Пароль:</label>
+					<input class="fbr-login-modal__input-field" type="text" id="bug-password" placeholder="Введите пароль">
+
+					<button class="fbr-login-modal__submit-button" type="button" disabled="">Авторизоваться</button>
+				</div>
+			</form>
+		</div>
+
 		<!-- кнопка активации режима комментирования -->
 		<div class="fbr-comment__togle" id="plugin-comment-togle" data-active="false">
 
@@ -102,8 +129,29 @@ export function frontendPlugin() {
 				<button class="fbr-sidebar__tab sidebar__tab--active" data-tab="sidebar-tab1">Активные (0)</button>
 				<button class="fbr-sidebar__tab" data-tab="sidebar-tab2">Решеные (0)</button>
 			</div>
+			<div class="fbr-sidebar__tabs">
+				<div class="custom-section">
+					<label for="parent-task">Родительская задача</label>
+					<div class="custom-dropdown">
+							<input type="text" id="parent-task" placeholder="Введите или выберите...">
+							<ul id="task-list" class="dropdown-content">
+									<li>QA-1</li>
+									<li>QA-2</li>
+									<li>QA-3</li>
+							</ul>
+							<button id="apply-btn">Применить</button>
+					</div>
+			</div>
+			<div class="custom-section">
+					<label>
+							<input type="checkbox" id="all-pages">
+							Все страницы
+					</label>
+			</div>
+	</div>
 			<div class="fbr-sidebar__tab-content fbr-sidebar__tab-content--active" id="sidebar-tab1">
 				<div class="fbr-bug-container">
+					
 				</div>
 			</div>
 			<div class="fbr-sidebar__tab-content" id="sidebar-tab2">
@@ -193,6 +241,9 @@ export function frontendPlugin() {
   font-weight: 600 !important;
   color: #303d4e !important;
   z-index: 2147483600 !important;
+}
+.fbr-bug-card.active {
+  background-color: #e3e3e3 !important;
 }
 
 .bug-sidebar-open {
@@ -426,6 +477,117 @@ export function frontendPlugin() {
     transform: rotate(360deg);
   }
 }
+.fbr-login-modal {
+  display: none !important;
+  position: absolute !important;
+  pointer-events: all !important;
+  z-index: 2147483600 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  align-items: center !important;
+}
+.fbr-login-modal__form {
+  width: 350px !important;
+  margin: 0 auto !important;
+  padding: 0px 15px 15px 15px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+  background-color: white !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+  color: #778aa7 !important;
+  font-family: "Poppins", sans-serif !important;
+  font-weight: 500 !important;
+  z-index: 2147483600 !important;
+  position: relative !important;
+}
+.fbr-login-modal__cancel-button {
+  position: relative;
+  left: 95%;
+  background: none !important;
+  border: none !important;
+  font-size: 30px !important;
+  cursor: pointer !important;
+  z-index: 2147483602 !important;
+  line-height: 1 !important;
+  color: #2ea2f6 !important;
+}
+.fbr-login-modal__tabs {
+  display: flex !important;
+  justify-content: space-between !important;
+  margin-bottom: 10px !important;
+}
+.fbr-login-modal__tab {
+  background: #ccc !important;
+  border: none !important;
+  padding: 5px 10px !important;
+  cursor: pointer !important;
+  z-index: 2147483600 !important;
+  border-radius: 4px !important;
+  font-size: 14px !important;
+}
+.fbr-login-modal__tab.active {
+  background-color: #2ea2f6 !important;
+  color: white !important;
+}
+.fbr-login-modal__input-label, .fbr-login-modal__input-field, .fbr-login-modal__textarea-field, .fbr-login-modal__select-field, .fbr-login-modal__next-button, .fbr-login-modal__submit-button {
+  width: 100% !important;
+  margin-bottom: 10px !important;
+  z-index: 2147483600 !important;
+  font-size: 14px !important;
+}
+.fbr-login-modal__input-field, .fbr-login-modal__textarea-field, .fbr-login-modal__select-field {
+  padding: 10px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+}
+.fbr-login-modal__submit-button {
+  padding: 10px !important;
+  background-color: #909497 !important;
+  border: none !important;
+  border-radius: 4px !important;
+  color: white !important;
+  cursor: pointer !important;
+}
+.fbr-login-modal__submit-button.active {
+  background-color: #2ea2f6 !important;
+  border: none !important;
+  border-radius: 4px !important;
+  color: white !important;
+  cursor: pointer !important;
+}
+
+@media only screen and (max-width: 768px) {
+  .fbr-login-modal__form {
+    pointer-events: all !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 15px !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background-color: white !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 2147483600 !important;
+    display: block !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+  .fbr-login-modal__cancel-button {
+    position: relative;
+    left: 47%;
+    background: none !important;
+    border: none !important;
+    font-size: 30px !important;
+    cursor: pointer !important;
+    z-index: 2147483602 !important;
+    line-height: 1 !important;
+    color: #2ea2f6 !important;
+  }
+}
 .fbr-plugin-layout {
   position: relative !important;
   z-index: 2147483600 !important;
@@ -626,6 +788,80 @@ export function frontendPlugin() {
 .fbr-sidebar::-webkit-scrollbar-thumb:hover {
   background-color: #555 !important;
   z-index: 2147483600 !important;
+}
+
+#sidebar-custom-content {
+  padding: 20px;
+}
+
+.custom-section {
+  margin-bottom: 15px;
+}
+
+.custom-section label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.custom-dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.custom-dropdown input {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.custom-dropdown button {
+  padding: 8px 15px;
+  margin-top: 10px;
+  background-color: #2ea2f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.custom-dropdown button:hover {
+  background-color: #1e87d3;
+}
+
+.dropdown-content {
+  position: absolute;
+  top: 45px;
+  left: 0;
+  width: 100%;
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  z-index: 1000;
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-content li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown-content li:hover {
+  background-color: #f1f1f1;
+}
+
+#all-pages {
+  margin-right: 5px;
 }
 
 @media only screen and (max-width: 768px) {

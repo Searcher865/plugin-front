@@ -135,6 +135,80 @@
         }
 }
 
+#sidebar-custom-content {
+    padding: 20px;
+}
+
+.custom-section {
+    margin-bottom: 15px;
+}
+
+.custom-section label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.custom-dropdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.custom-dropdown input {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.custom-dropdown button {
+    padding: 8px 15px;
+    margin-top: 10px;
+    background-color: #2ea2f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.custom-dropdown button:hover {
+    background-color: #1e87d3;
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 45px;
+    left: 0;
+    width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    z-index: 1000;
+    display: none;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dropdown-content li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.dropdown-content li:hover {
+    background-color: #f1f1f1;
+}
+
+#all-pages {
+    margin-right: 5px;
+}
+
 @media only screen and (max-width: 768px) {
     .fbr-sidebar--active {
       width: 100% !important;
