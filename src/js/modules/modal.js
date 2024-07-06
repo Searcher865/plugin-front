@@ -127,7 +127,6 @@ export class ModalHandler {
                 let parentKey = localStorage.getItem('parentKeyforFBR');
                 this.inputParent.value = parentKey;
 
-                         // Устанавливаем значение parentKey в поле ввода на модальном окне
 
                 //сдвигаем окно в сторону от клика
                 this.modalElement.style.left = xClick - 19 + 'px';
@@ -339,8 +338,8 @@ export class ModalHandler {
             const data = response.data.bugs;
 
             const parentKey = response.data.parentKeyForForm;
-            console.log("ОТОБРАЖЕНИЕ parentKeyforFBR после отправки бага "+parentKeyforFBR);
-        localStorage.setItem('parentKeyforFBR', parentKeyforFBR);
+            console.log("ОТОБРАЖЕНИЕ parentKeyforFBR после отправки бага "+parentKey);
+        localStorage.setItem('parentKeyforFBR', parentKey);
 
             console.log('Ответ от сервера:', data);
     

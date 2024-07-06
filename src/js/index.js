@@ -4,6 +4,7 @@ import { BugMarks } from './modules/bugMarks';
 import { BugService } from './modules/bugService';
 import { frontendPlugin } from './modules/frontendPlugin'; // Импорт фронтенда
 import { Sidebar } from "./modules/sidebar";
+import { SidebarFilter } from "./modules/sidebarFilter";
 import { Login } from './modules/login';
 
 
@@ -68,43 +69,7 @@ window.addEventListener('resize', function() {
 
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-  const inputField = document.getElementById('parent-task');
-  const dropdown = document.getElementById('task-list');
-  const applyBtn = document.getElementById('apply-btn');
-
-  // Show the dropdown when input is focused
-  inputField.addEventListener('focus', function() {
-      dropdown.style.display = 'block';
-  });
-
-  // Hide the dropdown when clicking outside of it
-  document.addEventListener('click', function(e) {
-      if (!document.querySelector('.custom-dropdown').contains(e.target)) {
-          dropdown.style.display = 'none';
-      }
-  });
-
-  // Fill input field with the clicked value from the dropdown
-  dropdown.addEventListener('click', function(e) {
-      if (e.target.tagName === 'LI') {
-          inputField.value = e.target.textContent;
-          dropdown.style.display = 'none';
-      }
-  });
-
-  // Apply button logic
-  applyBtn.addEventListener('click', function() {
-      const selectedValue = inputField.value.trim();
-
-      if (selectedValue !== '') {
-          alert(`Выбрана родительская задача: ${selectedValue}`);
-          // Здесь можно добавить логику для применения выбранного значения
-      } else {
-          alert('Выберите или введите значение для родительской задачи');
-      }
-  });
-});
+const sidebarFilter = new SidebarFilter();
 
 
 

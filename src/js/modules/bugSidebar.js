@@ -8,6 +8,7 @@ export class BugSidebar {
 
             // Получаем ссылки на все карточки багов
             this.bugCards = document.querySelectorAll('.fbr-bug-card');
+            console.log("СОЗДАЛИ BugSidebar");
             this.openBugCard()
             this.closeBugCard()
     }

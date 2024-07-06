@@ -129,24 +129,29 @@ export function frontendPlugin() {
 				<button class="fbr-sidebar__tab sidebar__tab--active" data-tab="sidebar-tab1">Активные (0)</button>
 				<button class="fbr-sidebar__tab" data-tab="sidebar-tab2">Решеные (0)</button>
 			</div>
-			<div class="fbr-sidebar__tabs">
-				<div class="custom-section">
-					<label for="parent-task">Родительская задача</label>
-					<div class="custom-dropdown">
-							<input type="text" id="parent-task" placeholder="Введите или выберите...">
-							<ul id="task-list" class="dropdown-content">
+			<div class="fbr-sidebar__filter">
+				<div class="fbr-custom-section">
+			
+					<div class="fbr-custom-dropdown">
+							<input type="text" id="fbr-parent-task" placeholder="Родительская задача">
+							<ul id="fbr-task-list" class="fbr-dropdown-content">
 									<li>QA-1</li>
 									<li>QA-2</li>
 									<li>QA-3</li>
+									<li>Все баги</li>
 							</ul>
-							<button id="apply-btn">Применить</button>
+				
+							<label>
+								<input type="checkbox" id="fbr-all-pages">
+								Все страницы
+						</label>
+
 					</div>
 			</div>
-			<div class="custom-section">
-					<label>
-							<input type="checkbox" id="all-pages">
-							Все страницы
-					</label>
+			<div class="fbr-custom-section">
+				<div class="fbr-loader-filter" style="display: none;"></div>
+				<button id="fbr-apply-btn">Oк</button>
+
 			</div>
 	</div>
 			<div class="fbr-sidebar__tab-content fbr-sidebar__tab-content--active" id="sidebar-tab1">
@@ -214,7 +219,7 @@ export function frontendPlugin() {
   justify-content: center !important;
   align-items: center !important;
   color: white !important;
-  z-index: 2147483600 !important;
+  z-index: 2147483599 !important;
 }
 .fbr-bug-card__author {
   flex-grow: 1 !important; /* Занимает оставшееся место в строке */
@@ -224,7 +229,7 @@ export function frontendPlugin() {
   font-size: 12px !important;
   line-height: 20px !important;
   color: #1c232d !important;
-  z-index: 2147483600 !important;
+  z-index: 2147483599 !important;
 }
 .fbr-bug-card__date {
   font-size: 10px !important;
@@ -461,6 +466,20 @@ export function frontendPlugin() {
   z-index: 2147483601; /* Выше z-index модального окна, чтобы лоадер был видимым */
 }
 
+.fbr-loader-filter {
+  margin: 7px;
+  border: 4px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 4px solid #3498db;
+  width: 30px;
+  height: 30px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 2147483601; /* Выше z-index модального окна, чтобы лоадер был видимым */
+}
+
 @-webkit-keyframes spin {
   0% {
     -webkit-transform: rotate(0deg);
@@ -676,6 +695,10 @@ export function frontendPlugin() {
   display: block !important;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2) !important;
   z-index: 2147483600 !important;
+  /* Кастомный скроллбар */
+  /* Фон скроллбара */
+  /* Стили для полосы скроллбара */
+  /* Стили для полосы скроллбара при наведении на неё */
 }
 .fbr-sidebar--active {
   left: 0 !important;
@@ -765,13 +788,6 @@ export function frontendPlugin() {
   display: block !important;
   z-index: 2147483600 !important;
 }
-
-.fbr-sidebar {
-  /* Кастомный скроллбар */
-  /* Фон скроллбара */
-  /* Стили для полосы скроллбара */
-  /* Стили для полосы скроллбара при наведении на неё */
-}
 .fbr-sidebar::-webkit-scrollbar {
   width: 5px !important; /* Ширина скроллбара */
   z-index: 2147483600 !important;
@@ -789,84 +805,96 @@ export function frontendPlugin() {
   background-color: #555 !important;
   z-index: 2147483600 !important;
 }
-
-#sidebar-custom-content {
-  padding: 20px;
+.fbr-sidebar__filter {
+  position: sticky !important;
+  background-color: white !important;
+  border-bottom: 1px solid #d4dae3 !important;
+  display: flex !important;
+  z-index: 2147483600 !important;
 }
 
-.custom-section {
-  margin-bottom: 15px;
+.fbr-custom-section {
+  z-index: 2147483601 !important;
 }
 
-.custom-section label {
-  display: block;
-  font-weight: 500;
-  margin-bottom: 5px;
+.fbr-custom-dropdown {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  flex-direction: column !important;
+  z-index: 2147483602 !important;
+  margin: 5px;
+}
+.fbr-custom-dropdown label {
+  font-weight: 500 !important;
+  margin-bottom: 5px !important;
+  z-index: 2147483601 !important;
+  font-size: 12px !important;
+  display: flex !important;
+  align-self: flex-start !important;
+  padding-top: 5px !important;
+}
+.fbr-custom-dropdown input {
+  padding: 8px !important;
+  font-size: 14px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+  z-index: 2147483601 !important;
+}
+.fbr-custom-dropdown button:hover {
+  background-color: #1e87d3 !important;
+  z-index: 2147483601 !important;
 }
 
-.custom-dropdown {
-  position: relative;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+.fbr-custom-section button {
+  padding: 8px 15px !important;
+  margin-top: 10px !important;
+  background-color: #2ea2f6 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease !important;
+  z-index: 2147483600 !important;
+  margin-top: 5px !important;
 }
 
-.custom-dropdown input {
-  width: 100%;
-  padding: 8px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.fbr-dropdown-content {
+  position: absolute !important;
+  top: 35px !important;
+  left: 0 !important;
+  width: 100% !important;
+  max-height: 150px !important;
+  overflow-y: auto !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+  background-color: white !important;
+  display: none !important;
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  z-index: 2147483602 !important;
+}
+.fbr-dropdown-content li {
+  font-size: 14px !important;
+  padding: 5px 5px 5px 10px !important;
+  cursor: pointer !important;
+  z-index: 2147483601 !important;
+}
+.fbr-dropdown-content li:hover {
+  background-color: #f1f1f1 !important;
+  z-index: 2147483601 !important;
 }
 
-.custom-dropdown button {
-  padding: 8px 15px;
-  margin-top: 10px;
-  background-color: #2ea2f6;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.custom-dropdown button:hover {
-  background-color: #1e87d3;
-}
-
-.dropdown-content {
-  position: absolute;
-  top: 45px;
-  left: 0;
-  width: 100%;
-  max-height: 150px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: white;
-  z-index: 1000;
-  display: none;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.dropdown-content li {
-  padding: 10px;
-  cursor: pointer;
-}
-
-.dropdown-content li:hover {
-  background-color: #f1f1f1;
-}
-
-#all-pages {
-  margin-right: 5px;
+#fbr-all-pages {
+  margin-right: 5px !important;
+  z-index: 2147483601 !important;
 }
 
 @media only screen and (max-width: 768px) {
   .fbr-sidebar--active {
     width: 100% !important;
+    z-index: 2147483601 !important;
   }
 }`;
   style.appendChild(document.createTextNode(css));

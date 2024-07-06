@@ -204,7 +204,6 @@ class ModalHandler {
                 let parentKey = localStorage.getItem('parentKeyforFBR');
                 this.inputParent.value = parentKey;
 
-                         // Устанавливаем значение parentKey в поле ввода на модальном окне
 
                 //сдвигаем окно в сторону от клика
                 this.modalElement.style.left = xClick - 19 + 'px';
@@ -416,8 +415,8 @@ class ModalHandler {
             const data = response.data.bugs;
 
             const parentKey = response.data.parentKeyForForm;
-            console.log("ОТОБРАЖЕНИЕ parentKeyforFBR после отправки бага "+parentKeyforFBR);
-        localStorage.setItem('parentKeyforFBR', parentKeyforFBR);
+            console.log("ОТОБРАЖЕНИЕ parentKeyforFBR после отправки бага "+parentKey);
+        localStorage.setItem('parentKeyforFBR', parentKey);
 
             console.log('Ответ от сервера:', data);
     
@@ -13250,6 +13249,7 @@ class BugSidebar {
 
             // Получаем ссылки на все карточки багов
             this.bugCards = document.querySelectorAll('.fbr-bug-card');
+            console.log("СОЗДАЛИ BugSidebar");
             this.openBugCard()
             this.closeBugCard()
     }
@@ -13318,54 +13318,55 @@ __webpack_require__.r(__webpack_exports__);
 
 class BugService {
 
-  constructor() {
-    this.bugData = new _bugData__WEBPACK_IMPORTED_MODULE_1__.BugData();
-    this.dataCollector = new _dataCollector__WEBPACK_IMPORTED_MODULE_2__.DataCollector();
-    this.loginModal = new _loginModal__WEBPACK_IMPORTED_MODULE_3__.LoginModal();
+    constructor() {
+        this.bugData = new _bugData__WEBPACK_IMPORTED_MODULE_1__.BugData();
+        this.dataCollector = new _dataCollector__WEBPACK_IMPORTED_MODULE_2__.DataCollector();
+        this.loginModal = new _loginModal__WEBPACK_IMPORTED_MODULE_3__.LoginModal();
 
-    this.bugMarks = new _bugMarks__WEBPACK_IMPORTED_MODULE_4__.BugMarks()
-    this.bugList = new _bugList__WEBPACK_IMPORTED_MODULE_5__.BugList()
+        this.bugMarks = new _bugMarks__WEBPACK_IMPORTED_MODULE_4__.BugMarks()
+        this.bugList = new _bugList__WEBPACK_IMPORTED_MODULE_5__.BugList()
 
-  }
-
-  async getResponseBugs() {
-    const url = new URL(`${_config_js__WEBPACK_IMPORTED_MODULE_6__["default"].apiUrl}/bugs`);
-    const urlPage = this.dataCollector.getCurrentURL();
-    url.searchParams.append('url', urlPage);
-    let parentKey = localStorage.getItem('parentKeyforFBR');
-    url.searchParams.append('parentKey', parentKey);
-
-    try {
-        // Извлекаем токен из localStorage
-        const token = localStorage.getItem('tokenFBR');
-        if (!token) {
-   this.loginModal.showLoginForm()
-            throw new Error('Token is not available in localStorage');
-        }
-
-        // Отправляем GET-запрос с заголовком Authorization
-        console.log("Перед отправкой запроса");
-        const response = await _interceptor__WEBPACK_IMPORTED_MODULE_0__["default"].get(url.toString(), {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        // Распарсим JSON-ответ
-        const data = response.data.bugs;
-
-        const parentKey = response.data.parentKeyForForm;
-        localStorage.setItem('parentKeyforFBR', parentKey);
-
-        console.log('Ответ сервера:', data);
-        this.bugData.setBugs(data);
-        this.bugMarks.renderBugMark()
-        this.bugList.renderBugList()
-    } catch (error) {
-        console.error('Произошла ошибка:', error);
-        alert(`Отсутствует соединение с сервером: ${error}`);
     }
-}
+
+    async getResponseBugs() {
+        const url = new URL(`${_config_js__WEBPACK_IMPORTED_MODULE_6__["default"].apiUrl}/bugs`);
+        const urlPage = this.dataCollector.getCurrentURL();
+        url.searchParams.append('url', urlPage);
+        let parentKey = localStorage.getItem('parentKeyforFBR');
+        url.searchParams.append('parentKey', parentKey);
+
+        try {
+            // Извлекаем токен из localStorage
+            const token = localStorage.getItem('tokenFBR');
+            if (!token) {
+                this.loginModal.showLoginForm()
+                console.log("МОДАЛЬНОЕ ОКНО ЛОГИНА НЕ ДОЛЖНО ПОЯВИТЬСЯ");
+                throw new Error('Token is not available in localStorage');
+            }
+
+            // Отправляем GET-запрос с заголовком Authorization
+            console.log("Перед отправкой запроса");
+            const response = await _interceptor__WEBPACK_IMPORTED_MODULE_0__["default"].get(url.toString(), {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            // Распарсим JSON-ответ
+            const data = response.data.bugs;
+
+            let parentKey = response.data.parentKeyForForm;
+            localStorage.setItem('parentKeyforFBR', parentKey);
+
+            console.log('Ответ сервера:', data);
+            this.bugData.setBugs(data);
+            this.bugMarks.renderBugMark()
+            this.bugList.renderBugList()
+        } catch (error) {
+            console.error('Произошла ошибка:', error);
+            alert(`Отсутствует соединение с сервером: ${error}`);
+        }
+    }
 
 
 }  
@@ -13510,24 +13511,29 @@ function frontendPlugin() {
 				<button class="fbr-sidebar__tab sidebar__tab--active" data-tab="sidebar-tab1">Активные (0)</button>
 				<button class="fbr-sidebar__tab" data-tab="sidebar-tab2">Решеные (0)</button>
 			</div>
-			<div class="fbr-sidebar__tabs">
-				<div class="custom-section">
-					<label for="parent-task">Родительская задача</label>
-					<div class="custom-dropdown">
-							<input type="text" id="parent-task" placeholder="Введите или выберите...">
-							<ul id="task-list" class="dropdown-content">
+			<div class="fbr-sidebar__filter">
+				<div class="fbr-custom-section">
+			
+					<div class="fbr-custom-dropdown">
+							<input type="text" id="fbr-parent-task" placeholder="Родительская задача">
+							<ul id="fbr-task-list" class="fbr-dropdown-content">
 									<li>QA-1</li>
 									<li>QA-2</li>
 									<li>QA-3</li>
+									<li>Все баги</li>
 							</ul>
-							<button id="apply-btn">Применить</button>
+				
+							<label>
+								<input type="checkbox" id="fbr-all-pages">
+								Все страницы
+						</label>
+
 					</div>
 			</div>
-			<div class="custom-section">
-					<label>
-							<input type="checkbox" id="all-pages">
-							Все страницы
-					</label>
+			<div class="fbr-custom-section">
+				<div class="fbr-loader-filter" style="display: none;"></div>
+				<button id="fbr-apply-btn">Oк</button>
+
 			</div>
 	</div>
 			<div class="fbr-sidebar__tab-content fbr-sidebar__tab-content--active" id="sidebar-tab1">
@@ -13595,7 +13601,7 @@ function frontendPlugin() {
   justify-content: center !important;
   align-items: center !important;
   color: white !important;
-  z-index: 2147483600 !important;
+  z-index: 2147483599 !important;
 }
 .fbr-bug-card__author {
   flex-grow: 1 !important; /* Занимает оставшееся место в строке */
@@ -13605,7 +13611,7 @@ function frontendPlugin() {
   font-size: 12px !important;
   line-height: 20px !important;
   color: #1c232d !important;
-  z-index: 2147483600 !important;
+  z-index: 2147483599 !important;
 }
 .fbr-bug-card__date {
   font-size: 10px !important;
@@ -13842,6 +13848,20 @@ function frontendPlugin() {
   z-index: 2147483601; /* Выше z-index модального окна, чтобы лоадер был видимым */
 }
 
+.fbr-loader-filter {
+  margin: 7px;
+  border: 4px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 4px solid #3498db;
+  width: 30px;
+  height: 30px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 2147483601; /* Выше z-index модального окна, чтобы лоадер был видимым */
+}
+
 @-webkit-keyframes spin {
   0% {
     -webkit-transform: rotate(0deg);
@@ -14057,6 +14077,10 @@ function frontendPlugin() {
   display: block !important;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2) !important;
   z-index: 2147483600 !important;
+  /* Кастомный скроллбар */
+  /* Фон скроллбара */
+  /* Стили для полосы скроллбара */
+  /* Стили для полосы скроллбара при наведении на неё */
 }
 .fbr-sidebar--active {
   left: 0 !important;
@@ -14146,13 +14170,6 @@ function frontendPlugin() {
   display: block !important;
   z-index: 2147483600 !important;
 }
-
-.fbr-sidebar {
-  /* Кастомный скроллбар */
-  /* Фон скроллбара */
-  /* Стили для полосы скроллбара */
-  /* Стили для полосы скроллбара при наведении на неё */
-}
 .fbr-sidebar::-webkit-scrollbar {
   width: 5px !important; /* Ширина скроллбара */
   z-index: 2147483600 !important;
@@ -14170,84 +14187,96 @@ function frontendPlugin() {
   background-color: #555 !important;
   z-index: 2147483600 !important;
 }
-
-#sidebar-custom-content {
-  padding: 20px;
+.fbr-sidebar__filter {
+  position: sticky !important;
+  background-color: white !important;
+  border-bottom: 1px solid #d4dae3 !important;
+  display: flex !important;
+  z-index: 2147483600 !important;
 }
 
-.custom-section {
-  margin-bottom: 15px;
+.fbr-custom-section {
+  z-index: 2147483601 !important;
 }
 
-.custom-section label {
-  display: block;
-  font-weight: 500;
-  margin-bottom: 5px;
+.fbr-custom-dropdown {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  flex-direction: column !important;
+  z-index: 2147483602 !important;
+  margin: 5px;
+}
+.fbr-custom-dropdown label {
+  font-weight: 500 !important;
+  margin-bottom: 5px !important;
+  z-index: 2147483601 !important;
+  font-size: 12px !important;
+  display: flex !important;
+  align-self: flex-start !important;
+  padding-top: 5px !important;
+}
+.fbr-custom-dropdown input {
+  padding: 8px !important;
+  font-size: 14px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+  z-index: 2147483601 !important;
+}
+.fbr-custom-dropdown button:hover {
+  background-color: #1e87d3 !important;
+  z-index: 2147483601 !important;
 }
 
-.custom-dropdown {
-  position: relative;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+.fbr-custom-section button {
+  padding: 8px 15px !important;
+  margin-top: 10px !important;
+  background-color: #2ea2f6 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease !important;
+  z-index: 2147483600 !important;
+  margin-top: 5px !important;
 }
 
-.custom-dropdown input {
-  width: 100%;
-  padding: 8px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.fbr-dropdown-content {
+  position: absolute !important;
+  top: 35px !important;
+  left: 0 !important;
+  width: 100% !important;
+  max-height: 150px !important;
+  overflow-y: auto !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+  background-color: white !important;
+  display: none !important;
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  z-index: 2147483602 !important;
+}
+.fbr-dropdown-content li {
+  font-size: 14px !important;
+  padding: 5px 5px 5px 10px !important;
+  cursor: pointer !important;
+  z-index: 2147483601 !important;
+}
+.fbr-dropdown-content li:hover {
+  background-color: #f1f1f1 !important;
+  z-index: 2147483601 !important;
 }
 
-.custom-dropdown button {
-  padding: 8px 15px;
-  margin-top: 10px;
-  background-color: #2ea2f6;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.custom-dropdown button:hover {
-  background-color: #1e87d3;
-}
-
-.dropdown-content {
-  position: absolute;
-  top: 45px;
-  left: 0;
-  width: 100%;
-  max-height: 150px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: white;
-  z-index: 1000;
-  display: none;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.dropdown-content li {
-  padding: 10px;
-  cursor: pointer;
-}
-
-.dropdown-content li:hover {
-  background-color: #f1f1f1;
-}
-
-#all-pages {
-  margin-right: 5px;
+#fbr-all-pages {
+  margin-right: 5px !important;
+  z-index: 2147483601 !important;
 }
 
 @media only screen and (max-width: 768px) {
   .fbr-sidebar--active {
     width: 100% !important;
+    z-index: 2147483601 !important;
   }
 }`;
   style.appendChild(document.createTextNode(css));
@@ -14321,6 +14350,187 @@ class Sidebar {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   SidebarFilter: function() { return /* binding */ SidebarFilter; }
+/* harmony export */ });
+/* harmony import */ var _interceptor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
+/* harmony import */ var _bugMarks__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
+/* harmony import */ var _bugList__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(59);
+/* harmony import */ var _bugData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(57);
+/* harmony import */ var _loginModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(58);
+
+
+
+
+
+
+class SidebarFilter {
+  constructor() {
+    document.addEventListener('DOMContentLoaded', this.init.bind(this));
+    this.bugData = new _bugData__WEBPACK_IMPORTED_MODULE_3__.BugData();
+    this.bugMarks = new _bugMarks__WEBPACK_IMPORTED_MODULE_1__.BugMarks(this.bugData);
+    this.bugList = new _bugList__WEBPACK_IMPORTED_MODULE_2__.BugList(this.bugData);
+    this.loginModal = new _loginModal__WEBPACK_IMPORTED_MODULE_4__.LoginModal();
+
+    this.submitButton = document.getElementById('fbr-apply-btn');
+    this.loader = document.querySelector('.fbr-loader-filter');
+  }
+
+  init() {
+    this.inputField = document.getElementById('fbr-parent-task');
+    this.dropdown = document.getElementById('fbr-task-list');
+    this.applyBtn = document.getElementById('fbr-apply-btn');
+    this.allPagesCheckbox = document.getElementById('fbr-all-pages');
+
+    this.loadInitialValue();
+    this.addEventListeners();
+  }
+
+  loadInitialValue() {
+    const parentKey = localStorage.getItem('parentKeyforFBR');
+    if (parentKey) {
+      this.inputField.value = parentKey;
+    }
+  }
+
+  addEventListeners() {
+    this.inputField.addEventListener('focus', this.showDropdown.bind(this));
+    document.addEventListener('click', this.hideDropdownOnClickOutside.bind(this));
+    this.dropdown.addEventListener('click', this.fillInputField.bind(this));
+    this.applyBtn.addEventListener('click', this.applySelectedValue.bind(this));
+  }
+
+  showDropdown() {
+    this.dropdown.style.setProperty('display', 'block', 'important');
+  }
+
+  hideDropdownOnClickOutside(e) {
+    if (!document.querySelector('.fbr-custom-dropdown').contains(e.target)) {
+      this.dropdown.style.display = 'none';
+    }
+  }
+
+  fillInputField(e) {
+    if (e.target.tagName === 'LI') {
+      const selectedValue = e.target.textContent;
+      this.inputField.value = selectedValue;
+      this.dropdown.style.display = 'none';
+      localStorage.setItem('parentKeyforFBR', selectedValue);
+    }
+  }
+
+  applySelectedValue() {
+    const selectedValue = this.inputField.value.trim();
+    
+    if (selectedValue !== '') {
+      localStorage.setItem('parentKeyforFBR', selectedValue);
+      
+      if (this.allPagesCheckbox.checked) {
+        this.sendGetRequestToBugList(selectedValue);
+      } else {
+        this.sendGetRequest(selectedValue);
+      }
+    } else {
+      alert('Выберите или введите значение для родительской задачи');
+    }
+  }
+
+  async sendGetRequest(parentKey) {
+    const token = localStorage.getItem('tokenFBR');
+    if (!token) {
+      this.loginModal.showLoginForm();
+      throw new Error('Token is not available in localStorage');
+    }
+
+    try {
+      this.showLoader();
+      const response = await _interceptor__WEBPACK_IMPORTED_MODULE_0__["default"].get('http://localhost:3000/api/bugs', {
+        params: {
+          url: window.location.href,
+          parentKey: parentKey
+        },
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      this.handleResponse(response);
+    } catch (error) {
+      console.error('Произошла ошибка:', error);
+      if (error.response) {
+          alert(`Произошла ошибка: ${error.response.status}\nОтвет от сервера: ${JSON.stringify(error.response.data.message)}`);
+      } else {
+          alert(`Отсутствует соединение с сервером: ${error.message}`);
+      }
+  } finally {
+    this.hideLoader(); // Скрыть лоадер после получения ответа от сервера
+}
+  }
+
+  async sendGetRequestToBugList(parentKey) {
+    const token = localStorage.getItem('tokenFBR');
+    if (!token) {
+      this.loginModal.showLoginForm();
+      throw new Error('Token is not available in localStorage');
+    }
+
+    try {
+      this.showLoader();
+      const response = await _interceptor__WEBPACK_IMPORTED_MODULE_0__["default"].get('http://localhost:3000/api/bugList', {
+        params: {
+          parentKey: parentKey
+        },
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      this.handleResponse(response);
+    } catch (error) {
+      console.error('Произошла ошибка:', error);
+      if (error.response) {
+          alert(`Произошла ошибка: ${error.response.status}\nОтвет от сервера: ${JSON.stringify(error.response.data.message)}`);
+      } else {
+          alert(`Отсутствует соединение с сервером: ${error.message}`);
+      }
+  } finally {
+    this.hideLoader(); // Скрыть лоадер после получения ответа от сервера
+}
+  }
+
+  handleResponse(response) {
+    const data = response.data.bugs;
+    const parentKey = response.data.parentKeyForForm;
+
+    console.log("ОТОБРАЖЕНИЕ parentKeyforFBR после отправки бага " + parentKey);
+    localStorage.setItem('parentKeyforFBR', parentKey);
+
+    console.log('Ответ от сервера:', data);
+
+    this.bugData.setBugs(data);
+    this.bugMarks.renderBugMark();
+    this.bugList.renderBugList();
+  }
+
+  showLoader() {
+   
+    this.loader.style.display = 'block';
+    this.submitButton.style.visibility = 'hidden'; // Скрываем кнопку "Отправить"
+}
+
+// Скрыть лоадер
+hideLoader() {
+    
+  this.loader.style.display = 'none';
+    this.submitButton.style.visibility = 'visible'; // Восстанавливаем кнопку "Отправить"
+}
+}
+
+
+/***/ }),
+/* 66 */
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Login: function() { return /* binding */ Login; }
 /* harmony export */ });
 /* harmony import */ var _dataCollector__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
@@ -14365,6 +14575,7 @@ class Login {
             if (response.status === 200) {
                 const data = response.data;
                 localStorage.setItem('tokenFBR', data.accessToken);
+                localStorage.setItem('parentKeyforFBR', data.user.parentKeyForForm);
                 alert('Login successful!');
                 this.bugService.getResponseBugs()
                 this.loginModal.closeModal();
@@ -14460,7 +14671,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_bugService__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(62);
 /* harmony import */ var _modules_frontendPlugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(63);
 /* harmony import */ var _modules_sidebar__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(64);
-/* harmony import */ var _modules_login__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(65);
+/* harmony import */ var _modules_sidebarFilter__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(65);
+/* harmony import */ var _modules_login__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(66);
 
  // Импорт класса ModalHandler
 
@@ -14471,12 +14683,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 const urlParams = new URLSearchParams(window.location.search);
 
 if (urlParams.has('fbr')) {
   
 (0,_modules_frontendPlugin__WEBPACK_IMPORTED_MODULE_4__.frontendPlugin)();
-new _modules_login__WEBPACK_IMPORTED_MODULE_6__.Login();
+new _modules_login__WEBPACK_IMPORTED_MODULE_7__.Login();
 const modalHandler = new _modules_modal__WEBPACK_IMPORTED_MODULE_1__.ModalHandler();
 const sidebar = new _modules_sidebar__WEBPACK_IMPORTED_MODULE_5__.Sidebar();
 const bugService = new _modules_bugService__WEBPACK_IMPORTED_MODULE_3__.BugService();
@@ -14531,43 +14744,7 @@ window.addEventListener('resize', function() {
 
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-  const inputField = document.getElementById('parent-task');
-  const dropdown = document.getElementById('task-list');
-  const applyBtn = document.getElementById('apply-btn');
-
-  // Show the dropdown when input is focused
-  inputField.addEventListener('focus', function() {
-      dropdown.style.display = 'block';
-  });
-
-  // Hide the dropdown when clicking outside of it
-  document.addEventListener('click', function(e) {
-      if (!document.querySelector('.custom-dropdown').contains(e.target)) {
-          dropdown.style.display = 'none';
-      }
-  });
-
-  // Fill input field with the clicked value from the dropdown
-  dropdown.addEventListener('click', function(e) {
-      if (e.target.tagName === 'LI') {
-          inputField.value = e.target.textContent;
-          dropdown.style.display = 'none';
-      }
-  });
-
-  // Apply button logic
-  applyBtn.addEventListener('click', function() {
-      const selectedValue = inputField.value.trim();
-
-      if (selectedValue !== '') {
-          alert(`Выбрана родительская задача: ${selectedValue}`);
-          // Здесь можно добавить логику для применения выбранного значения
-      } else {
-          alert('Выберите или введите значение для родительской задачи');
-      }
-  });
-});
+const sidebarFilter = new _modules_sidebarFilter__WEBPACK_IMPORTED_MODULE_6__.SidebarFilter();
 
 
 

@@ -27,7 +27,7 @@
         justify-content: center !important;
         align-items: center !important;
         color: white !important;
-        z-index: 2147483600 !important;
+        z-index: 2147483599 !important;
     }
     &__author {
         flex-grow: 1 !important; /* Занимает оставшееся место в строке */
@@ -37,7 +37,7 @@
         font-size: 12px !important;
         line-height: 20px !important;
         color: #1c232d !important;
-        z-index: 2147483600 !important;
+        z-index: 2147483599 !important;
     }
     &__date {
         font-size: 10px !important;

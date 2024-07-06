@@ -144,24 +144,29 @@
 				<button class="fbr-sidebar__tab sidebar__tab--active" data-tab="sidebar-tab1">Активные (0)</button>
 				<button class="fbr-sidebar__tab" data-tab="sidebar-tab2">Решеные (0)</button>
 			</div>
-			<div class="fbr-sidebar__tabs">
-				<div class="custom-section">
-					<label for="parent-task">Родительская задача</label>
-					<div class="custom-dropdown">
-							<input type="text" id="parent-task" placeholder="Введите или выберите...">
-							<ul id="task-list" class="dropdown-content">
+			<div class="fbr-sidebar__filter">
+				<div class="fbr-custom-section">
+			
+					<div class="fbr-custom-dropdown">
+							<input type="text" id="fbr-parent-task" placeholder="Родительская задача">
+							<ul id="fbr-task-list" class="fbr-dropdown-content">
 									<li>QA-1</li>
 									<li>QA-2</li>
 									<li>QA-3</li>
+									<li>Все баги</li>
 							</ul>
-							<button id="apply-btn">Применить</button>
+				
+							<label>
+								<input type="checkbox" id="fbr-all-pages">
+								Все страницы
+						</label>
+
 					</div>
 			</div>
-			<div class="custom-section">
-					<label>
-							<input type="checkbox" id="all-pages">
-							Все страницы
-					</label>
+			<div class="fbr-custom-section">
+				<div class="fbr-loader-filter" style="display: none;"></div>
+				<button id="fbr-apply-btn">Oк</button>
+
 			</div>
 	</div>
 			<div class="fbr-sidebar__tab-content fbr-sidebar__tab-content--active" id="sidebar-tab1">

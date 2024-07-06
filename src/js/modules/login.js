@@ -36,6 +36,7 @@ export class Login {
             if (response.status === 200) {
                 const data = response.data;
                 localStorage.setItem('tokenFBR', data.accessToken);
+                localStorage.setItem('parentKeyforFBR', data.user.parentKeyForForm);
                 alert('Login successful!');
                 this.bugService.getResponseBugs()
                 this.loginModal.closeModal();
