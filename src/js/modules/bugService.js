@@ -52,6 +52,7 @@ export class BugService {
             this.bugData.setBugs(data);
             this.bugMarks.renderBugMark()
             this.bugList.renderBugList()
+           
         } catch (error) {
             console.error('Произошла ошибка:', error);
             alert(`Отсутствует соединение с сервером: ${error}`);

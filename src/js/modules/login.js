@@ -40,6 +40,7 @@ export class Login {
                 alert('Login successful!');
                 this.bugService.getResponseBugs()
                 this.loginModal.closeModal();
+           
           
             } else {
                 alert('Login failed!');

@@ -4,7 +4,7 @@ import { BugMarks } from './modules/bugMarks';
 import { BugService } from './modules/bugService';
 import { frontendPlugin } from './modules/frontendPlugin'; // Импорт фронтенда
 import { Sidebar } from "./modules/sidebar";
-import { SidebarFilter } from "./modules/sidebarFilter";
+// import { SidebarFilter } from "./modules/sidebarFilter";
 import { Login } from './modules/login';
 
 
@@ -20,6 +20,7 @@ const sidebar = new Sidebar();
 const bugService = new BugService();
 const bugMarks = new BugMarks();
 const toggleCommentHandler = new ToggleCommentHandler();
+// const sidebarFilter = new SidebarFilter();
 
 
 modalHandler.setupStepNavigation()
@@ -69,7 +70,7 @@ window.addEventListener('resize', function() {
 
 });
 
-const sidebarFilter = new SidebarFilter();
+
 
 
 

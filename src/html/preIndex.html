@@ -141,8 +141,8 @@
 
 			</div>
 			<div class="fbr-sidebar__tabs">
-				<button class="fbr-sidebar__tab sidebar__tab--active" data-tab="sidebar-tab1">Активные (0)</button>
-				<button class="fbr-sidebar__tab" data-tab="sidebar-tab2">Решеные (0)</button>
+				<button class="fbr-sidebar__tab fbr-sidebar__tab--active" data-tab="fbr-sidebar-tab-open">Активные (0)</button>
+				<button class="fbr-sidebar__tab" data-tab="fbr-sidebar-tab-closed">Решеные (0)</button>
 			</div>
 			<div class="fbr-sidebar__filter">
 				<div class="fbr-custom-section">
@@ -150,10 +150,6 @@
 					<div class="fbr-custom-dropdown">
 							<input type="text" id="fbr-parent-task" placeholder="Родительская задача">
 							<ul id="fbr-task-list" class="fbr-dropdown-content">
-									<li>QA-1</li>
-									<li>QA-2</li>
-									<li>QA-3</li>
-									<li>Все баги</li>
 							</ul>
 				
 							<label>
@@ -169,13 +165,13 @@
 
 			</div>
 	</div>
-			<div class="fbr-sidebar__tab-content fbr-sidebar__tab-content--active" id="sidebar-tab1">
-				<div class="fbr-bug-container">
+			<div class="fbr-sidebar__tab-content fbr-sidebar__tab-content--active" id="fbr-sidebar-tab-open">
+				<div class="fbr-bug-container-open">
 					
 				</div>
 			</div>
-			<div class="fbr-sidebar__tab-content" id="sidebar-tab2">
-				<div class="fbr-bug-container">
+			<div class="fbr-sidebar__tab-content" id="fbr-sidebar-tab-closed">
+				<div class="fbr-bug-container-closed">
 					<span>Контент для Таба 2</span>
 				</div>
 			</div>

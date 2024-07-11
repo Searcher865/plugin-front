@@ -126,8 +126,8 @@ export function frontendPlugin() {
 
 			</div>
 			<div class="fbr-sidebar__tabs">
-				<button class="fbr-sidebar__tab sidebar__tab--active" data-tab="sidebar-tab1">Активные (0)</button>
-				<button class="fbr-sidebar__tab" data-tab="sidebar-tab2">Решеные (0)</button>
+				<button class="fbr-sidebar__tab fbr-sidebar__tab--active" data-tab="fbr-sidebar-tab-open">Активные (0)</button>
+				<button class="fbr-sidebar__tab" data-tab="fbr-sidebar-tab-closed">Решеные (0)</button>
 			</div>
 			<div class="fbr-sidebar__filter">
 				<div class="fbr-custom-section">
@@ -135,10 +135,6 @@ export function frontendPlugin() {
 					<div class="fbr-custom-dropdown">
 							<input type="text" id="fbr-parent-task" placeholder="Родительская задача">
 							<ul id="fbr-task-list" class="fbr-dropdown-content">
-									<li>QA-1</li>
-									<li>QA-2</li>
-									<li>QA-3</li>
-									<li>Все баги</li>
 							</ul>
 				
 							<label>
@@ -154,13 +150,13 @@ export function frontendPlugin() {
 
 			</div>
 	</div>
-			<div class="fbr-sidebar__tab-content fbr-sidebar__tab-content--active" id="sidebar-tab1">
-				<div class="fbr-bug-container">
+			<div class="fbr-sidebar__tab-content fbr-sidebar__tab-content--active" id="fbr-sidebar-tab-open">
+				<div class="fbr-bug-container-open">
 					
 				</div>
 			</div>
-			<div class="fbr-sidebar__tab-content" id="sidebar-tab2">
-				<div class="fbr-bug-container">
+			<div class="fbr-sidebar__tab-content" id="fbr-sidebar-tab-closed">
+				<div class="fbr-bug-container-closed">
 					<span>Контент для Таба 2</span>
 				</div>
 			</div>
@@ -205,10 +201,10 @@ export function frontendPlugin() {
   z-index: 2147483600 !important;
 }
 .fbr-bug-card__number {
-  width: 26px !important;
-  height: 26px !important;
+  width: 35px !important;
+  height: 35px !important;
   line-height: 20px !important;
-  font-size: 10px !important;
+  font-size: 14px !important;
   border: 2px solid #fff !important;
   background: #2ea2f6 !important;
   margin-right: 5px !important;
@@ -222,6 +218,16 @@ export function frontendPlugin() {
   z-index: 2147483599 !important;
 }
 .fbr-bug-card__author {
+  flex-grow: 1 !important; /* Занимает оставшееся место в строке */
+  margin-right: 10px !important;
+  font-family: "Poppins", sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  line-height: 20px !important;
+  color: #1c232d !important;
+  z-index: 2147483599 !important;
+}
+.fbr-bug-card__status {
   flex-grow: 1 !important; /* Занимает оставшееся место в строке */
   margin-right: 10px !important;
   font-family: "Poppins", sans-serif !important;
@@ -648,6 +654,17 @@ export function frontendPlugin() {
 }
 .fbr-plugin-ball__summary {
   font-size: 13px !important;
+}
+
+.fbr-plugin-ball-empty {
+  position: absolute !important;
+  width: 38px !important;
+  height: 38px !important;
+  transition: transform 0.12s ease, opacity 0.12s ease !important;
+  background-color: #2ea2f6 !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  z-index: 2147483600 !important;
 }
 
 .fbr-plugin-ball__number:hover + .fbr-plugin-ball__peek .fbr-plugin-ball__inner {

@@ -10,8 +10,7 @@ export function createPluginBall(xRelatively, yRelatively, xPath, container) {
         
         // Создаем ваш элемент "ball"
         const ball = document.createElement("div");
-        ball.classList.add("fbr-plugin-ball");
-        ball.classList.add("fbr-plugin-new-ball");
+        ball.classList.add("fbr-plugin-ball-empty");
         ball.innerHTML = `
             <div class="fbr-plugin-ball__number"><a></a></div>
             <div class="fbr-plugin-ball__peek">

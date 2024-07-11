@@ -84,16 +84,24 @@ export class DataCollector {
             // Получаем размеры видимой части страницы
             const screenWidth = window.innerWidth || document.documentElement.clientWidth;
             const screenHeight = window.innerHeight || document.documentElement.clientHeight;
-
-            
-            // Если элемент существует, отключаем его
-            const fbrpluginContainer = document.getElementById('fbrpluginContainer');
-            if (fbrpluginContainer) {
-                fbrpluginContainer.style.display = 'none';
-            }
-
-
-        
+    
+            // Находим все элементы с классом fbr-plugin-container и fbr-plugin-ball
+            const pluginContainers = document.querySelectorAll('.fbr-plugin-container');
+            const pluginBalls = document.querySelectorAll('.fbr-plugin-ball');
+    
+            // Сохраняем текущие значения display и скрываем элементы
+            const originalDisplay = [];
+    
+            pluginContainers.forEach(container => {
+                originalDisplay.push({ element: container, display: container.style.display });
+                container.style.display = 'none';
+            });
+    
+            pluginBalls.forEach(ball => {
+                originalDisplay.push({ element: ball, display: ball.style.display });
+                ball.style.display = 'none';
+            });
+    
             // Создаем скриншот видимой части страницы
             html2canvas(document.body, {
                 width: screenWidth,
@@ -103,12 +111,24 @@ export class DataCollector {
             }).then(function (canvas) {
                 // Получаем данные из Canvas в формате Data URL (бинарные данные в виде строки)
                 const dataUrl = canvas.toDataURL('image/jpeg'); // Указываем формат изображения
+    
+                // Восстанавливаем значения display у элементов
+                originalDisplay.forEach(item => {
+                    item.element.style.display = item.display;
+                });
+    
                 // Возвращаем Data URL
                 resolve(dataUrl);
-            }).catch(reject);
-
+            }).catch(error => {
+                // В случае ошибки, восстанавливаем значения display у элементов
+                originalDisplay.forEach(item => {
+                    item.element.style.display = item.display;
+                });
+                reject(error);
+            });
         });
     }
+    
 
 
 

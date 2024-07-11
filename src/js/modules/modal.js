@@ -4,8 +4,9 @@ import { BugList } from './bugList';
 import { BugData } from './bugData';
 import { createPluginBall } from "./createBall";
 import { BugSidebar } from "./bugSidebar";
+
 import config from '../config.js';
-import axios from 'axios';
+import axios from './interceptor';
 
 
 
@@ -16,6 +17,7 @@ export class ModalHandler {
         this.bugData = new BugData();
         this.bugMarks = new BugMarks();
         this.bugList = new BugList();
+
 
         this.modalElement = document.querySelector('.fbr-bug-report');
         this.cancelButton = this.modalElement.querySelector('.fbr-bug-report__cancel-button');
@@ -37,6 +39,8 @@ export class ModalHandler {
         this.nextButtons = document.querySelectorAll('.fbr-bug-report__next-button');
         // Получаем ссылку на поле "Название бага"
         this.bugTitleInput = document.querySelector('#bug-title');
+           // Получаем ссылку на поле "Родительская задача"
+           this.bugParentKeyInput = document.querySelector('#bug-parent');
         
 
         // Проверяем существование элемента с классом .fbr-bug-report
@@ -80,6 +84,7 @@ export class ModalHandler {
         // Добавляем обработчик клика на кнопку
         this.cancelButton.addEventListener('click', (event) => {
             this.closeModal(); // Вызываем метод closeModal при клике
+            document.querySelector('.fbr-plugin-ball-empty').remove();
             event.stopPropagation();
         });
 
@@ -100,7 +105,8 @@ export class ModalHandler {
 
     // Функция открытия модального окна вместе с добавлением метки
     async openModal(event) {
-
+    // Очищаем FormData перед каждым открытием модального окна
+    this.formData = new FormData();
         // Проверяем, что модальное окно закрыто
         if (this.modalElement.style.display === 'none' || this.modalElement.style.display === '') {
             try {
@@ -117,16 +123,17 @@ export class ModalHandler {
 
                 createPluginBall(xRelatively, yRelatively, xpath, document.querySelector('.fbr-plugin-balls'));
                 const dataUrl = await this.dataCollector.makeScreenshot();
-/*                 const dataBlob = this.dataURLToBlob(dataUrl)
-                console.log("ВЫВОДИМ БЛОБ ИЗОБРАЖЕНИЯ "+ dataBlob); */
                 this.addToFormData("actualScreenshot", dataUrl)
 
                 this.modalElement.style.display = 'block'; //добавляем к модальному окну свойство display
                 this.modalElement.style.setProperty('display', 'block', 'important'); //добавляем к модальному окну свойство display
 
                 let parentKey = localStorage.getItem('parentKeyforFBR');
-                this.inputParent.value = parentKey;
-
+                if (parentKey) {
+                    // Извлекаем первое значение из parentKey
+                    const firstParentKey = parentKey.split(',')[0];
+                    this.inputParent.value = firstParentKey;
+                }
 
                 //сдвигаем окно в сторону от клика
                 this.modalElement.style.left = xClick - 19 + 'px';
@@ -139,8 +146,11 @@ export class ModalHandler {
     }
 
     setupStepNavigation() {
-
-
+        // Получаем ссылку на поле "Название бага"
+        this.bugTitleInput = document.querySelector('#bug-title');
+        // Получаем ссылку на поле "Родительская задача"
+        this.bugParentKeyInput = document.querySelector('#bug-parent');
+    
         // Добавляем обработчики событий для каждого таба
         this.tabs.forEach(tab => {
             tab.addEventListener('click', (event) => {
@@ -151,27 +161,30 @@ export class ModalHandler {
                 this.showStep(step, this.steps, this.tabs);
             });
         });
-
-        // Добавляем обработчик события на изменение содержимого поля "Название бага"
-        this.bugTitleInput.addEventListener('input', () => {
-            // Проверяем, заполнено ли поле "Название бага"
-            if (this.bugTitleInput.value.trim() !== '') {
-                // Если заполнено, делаем кнопку "Далее" активной
+    
+        // Функция для проверки заполненности обоих полей
+        const checkFields = () => {
+            if (this.bugTitleInput.value.trim() !== '' && this.bugParentKeyInput.value.trim() !== '') {
+                // Если оба поля заполнены, делаем кнопку "Далее" активной
                 this.nextButtons.forEach(nextButton => {
                     nextButton.classList.add('active');
                     nextButton.disabled = false;
-                })
-
+                });
             } else {
-                // Если не заполнено, делаем кнопку "Далее" неактивной
+                // Если хотя бы одно из полей не заполнено, делаем кнопку "Далее" неактивной
                 this.nextButtons.forEach(nextButton => {
                     nextButton.classList.remove('active');
                     nextButton.disabled = true;
-                })
-
+                });
             }
-        });
-
+        };
+    
+        // Добавляем обработчик события на изменение содержимого поля "Название бага"
+        this.bugTitleInput.addEventListener('input', checkFields);
+    
+        // Добавляем обработчик события на изменение содержимого поля "Родительская задача"
+        this.bugParentKeyInput.addEventListener('input', checkFields);
+    
         this.nextButtons.forEach(nextButton => {
             // Добавляем обработчик события на клик по кнопке "Далее"
             nextButton.addEventListener('click', () => {
@@ -182,12 +195,13 @@ export class ModalHandler {
                 // Показываем следующий этап
                 this.showStep(nextStep.toString(), this.steps, this.tabs);
             });
-        })
-
-
-
+        });
+    
         // Начинаем с показа первого этапа по умолчанию
         this.showStep('1', this.steps, this.tabs);
+    
+        // Проверяем поля при загрузке страницы
+        checkFields();
     }
 
     // Функция для показа выбранного этапа и скрытия остальных
@@ -255,8 +269,6 @@ export class ModalHandler {
     closeModal() {
         this.clearFormFields()
 
-        document.querySelector('.fbr-plugin-new-ball').remove();
-
         this.pluginContainer.style.display = 'block'
         this.pluginContainer.style.setProperty('display', 'block', 'important');
         this.modalElement.style.display = 'none';
@@ -268,7 +280,7 @@ export class ModalHandler {
         this.formData.append(name, value);
         return this.formData
     }
-
+    
     dataURLToBlob(dataURL) {
 
         const parts = dataURL.split(';base64,');
@@ -304,6 +316,7 @@ export class ModalHandler {
     }
 
     async sendBugReport() {
+        
         this.addToFormData("url", this.dataCollector.getCurrentURL());
         this.addToFormData("OsVersion", await this.dataCollector.getOSVersion());
         this.addToFormData("environment", this.dataCollector.getEnvironment());
@@ -316,6 +329,8 @@ export class ModalHandler {
         this.addToFormData("expectedResult", this.inputExpectedResult.value);
         this.addToFormData("priority", this.selectedPriority.value);
         this.addToFormData("tags", this.selectedTags.value);
+
+
     
         try {
             this.showLoader();
@@ -345,24 +360,23 @@ export class ModalHandler {
     
             this.bugData.setBugs(data);
             this.formData = new FormData();
-            this.modalElement.style.display = 'none';
-            this.modalElement.style.setProperty('display', 'none', 'important');
-            this.pluginContainer.style.display = 'block';
-            this.pluginContainer.style.setProperty('display', 'block', 'important');
             this.bugMarks.renderBugMark();
             this.bugList.renderBugList();
-            this.clearFormFields();
-            new BugSidebar();
         } catch (error) {
             console.error('Произошла ошибка:', error);
+            document.querySelector('.fbr-plugin-ball-empty').remove();
             if (error.response) {
                 alert(`Произошла ошибка: ${error.response.status}\nОтвет от сервера: ${JSON.stringify(error.response.data.message)}`);
+                
             } else {
                 alert(`Отсутствует соединение с сервером: ${error.message}`);
             }
         } finally {
             this.hideLoader(); // Скрыть лоадер после получения ответа от сервера
             this.submitButton.style.visibility = 'visible'; // Восстанавливаем кнопку "Отправить"
+            this.closeModal()
+            new BugSidebar();
+    
         }
     }
 }

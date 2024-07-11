@@ -74,7 +74,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _createBall__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(60);
 /* harmony import */ var _bugSidebar__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(61);
 /* harmony import */ var _config_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(7);
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(8);
+/* harmony import */ var _interceptor__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(6);
+
 
 
 
@@ -93,6 +94,7 @@ class ModalHandler {
         this.bugData = new _bugData__WEBPACK_IMPORTED_MODULE_3__.BugData();
         this.bugMarks = new _bugMarks__WEBPACK_IMPORTED_MODULE_1__.BugMarks();
         this.bugList = new _bugList__WEBPACK_IMPORTED_MODULE_2__.BugList();
+
 
         this.modalElement = document.querySelector('.fbr-bug-report');
         this.cancelButton = this.modalElement.querySelector('.fbr-bug-report__cancel-button');
@@ -114,6 +116,8 @@ class ModalHandler {
         this.nextButtons = document.querySelectorAll('.fbr-bug-report__next-button');
         // Получаем ссылку на поле "Название бага"
         this.bugTitleInput = document.querySelector('#bug-title');
+           // Получаем ссылку на поле "Родительская задача"
+           this.bugParentKeyInput = document.querySelector('#bug-parent');
         
 
         // Проверяем существование элемента с классом .fbr-bug-report
@@ -157,6 +161,7 @@ class ModalHandler {
         // Добавляем обработчик клика на кнопку
         this.cancelButton.addEventListener('click', (event) => {
             this.closeModal(); // Вызываем метод closeModal при клике
+            document.querySelector('.fbr-plugin-ball-empty').remove();
             event.stopPropagation();
         });
 
@@ -177,7 +182,8 @@ class ModalHandler {
 
     // Функция открытия модального окна вместе с добавлением метки
     async openModal(event) {
-
+    // Очищаем FormData перед каждым открытием модального окна
+    this.formData = new FormData();
         // Проверяем, что модальное окно закрыто
         if (this.modalElement.style.display === 'none' || this.modalElement.style.display === '') {
             try {
@@ -194,16 +200,17 @@ class ModalHandler {
 
                 ;(0,_createBall__WEBPACK_IMPORTED_MODULE_4__.createPluginBall)(xRelatively, yRelatively, xpath, document.querySelector('.fbr-plugin-balls'));
                 const dataUrl = await this.dataCollector.makeScreenshot();
-/*                 const dataBlob = this.dataURLToBlob(dataUrl)
-                console.log("ВЫВОДИМ БЛОБ ИЗОБРАЖЕНИЯ "+ dataBlob); */
                 this.addToFormData("actualScreenshot", dataUrl)
 
                 this.modalElement.style.display = 'block'; //добавляем к модальному окну свойство display
                 this.modalElement.style.setProperty('display', 'block', 'important'); //добавляем к модальному окну свойство display
 
                 let parentKey = localStorage.getItem('parentKeyforFBR');
-                this.inputParent.value = parentKey;
-
+                if (parentKey) {
+                    // Извлекаем первое значение из parentKey
+                    const firstParentKey = parentKey.split(',')[0];
+                    this.inputParent.value = firstParentKey;
+                }
 
                 //сдвигаем окно в сторону от клика
                 this.modalElement.style.left = xClick - 19 + 'px';
@@ -216,8 +223,11 @@ class ModalHandler {
     }
 
     setupStepNavigation() {
-
-
+        // Получаем ссылку на поле "Название бага"
+        this.bugTitleInput = document.querySelector('#bug-title');
+        // Получаем ссылку на поле "Родительская задача"
+        this.bugParentKeyInput = document.querySelector('#bug-parent');
+    
         // Добавляем обработчики событий для каждого таба
         this.tabs.forEach(tab => {
             tab.addEventListener('click', (event) => {
@@ -228,27 +238,30 @@ class ModalHandler {
                 this.showStep(step, this.steps, this.tabs);
             });
         });
-
-        // Добавляем обработчик события на изменение содержимого поля "Название бага"
-        this.bugTitleInput.addEventListener('input', () => {
-            // Проверяем, заполнено ли поле "Название бага"
-            if (this.bugTitleInput.value.trim() !== '') {
-                // Если заполнено, делаем кнопку "Далее" активной
+    
+        // Функция для проверки заполненности обоих полей
+        const checkFields = () => {
+            if (this.bugTitleInput.value.trim() !== '' && this.bugParentKeyInput.value.trim() !== '') {
+                // Если оба поля заполнены, делаем кнопку "Далее" активной
                 this.nextButtons.forEach(nextButton => {
                     nextButton.classList.add('active');
                     nextButton.disabled = false;
-                })
-
+                });
             } else {
-                // Если не заполнено, делаем кнопку "Далее" неактивной
+                // Если хотя бы одно из полей не заполнено, делаем кнопку "Далее" неактивной
                 this.nextButtons.forEach(nextButton => {
                     nextButton.classList.remove('active');
                     nextButton.disabled = true;
-                })
-
+                });
             }
-        });
-
+        };
+    
+        // Добавляем обработчик события на изменение содержимого поля "Название бага"
+        this.bugTitleInput.addEventListener('input', checkFields);
+    
+        // Добавляем обработчик события на изменение содержимого поля "Родительская задача"
+        this.bugParentKeyInput.addEventListener('input', checkFields);
+    
         this.nextButtons.forEach(nextButton => {
             // Добавляем обработчик события на клик по кнопке "Далее"
             nextButton.addEventListener('click', () => {
@@ -259,12 +272,13 @@ class ModalHandler {
                 // Показываем следующий этап
                 this.showStep(nextStep.toString(), this.steps, this.tabs);
             });
-        })
-
-
-
+        });
+    
         // Начинаем с показа первого этапа по умолчанию
         this.showStep('1', this.steps, this.tabs);
+    
+        // Проверяем поля при загрузке страницы
+        checkFields();
     }
 
     // Функция для показа выбранного этапа и скрытия остальных
@@ -332,8 +346,6 @@ class ModalHandler {
     closeModal() {
         this.clearFormFields()
 
-        document.querySelector('.fbr-plugin-new-ball').remove();
-
         this.pluginContainer.style.display = 'block'
         this.pluginContainer.style.setProperty('display', 'block', 'important');
         this.modalElement.style.display = 'none';
@@ -345,7 +357,7 @@ class ModalHandler {
         this.formData.append(name, value);
         return this.formData
     }
-
+    
     dataURLToBlob(dataURL) {
 
         const parts = dataURL.split(';base64,');
@@ -381,6 +393,7 @@ class ModalHandler {
     }
 
     async sendBugReport() {
+        
         this.addToFormData("url", this.dataCollector.getCurrentURL());
         this.addToFormData("OsVersion", await this.dataCollector.getOSVersion());
         this.addToFormData("environment", this.dataCollector.getEnvironment());
@@ -393,6 +406,8 @@ class ModalHandler {
         this.addToFormData("expectedResult", this.inputExpectedResult.value);
         this.addToFormData("priority", this.selectedPriority.value);
         this.addToFormData("tags", this.selectedTags.value);
+
+
     
         try {
             this.showLoader();
@@ -405,7 +420,7 @@ class ModalHandler {
                 throw new Error('Token is not available in localStorage');
             }
 
-            const response = await axios__WEBPACK_IMPORTED_MODULE_7__["default"].post(apiUrl, this.formData, {
+            const response = await _interceptor__WEBPACK_IMPORTED_MODULE_7__["default"].post(apiUrl, this.formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                      'Authorization': `Bearer ${token}`
@@ -422,24 +437,23 @@ class ModalHandler {
     
             this.bugData.setBugs(data);
             this.formData = new FormData();
-            this.modalElement.style.display = 'none';
-            this.modalElement.style.setProperty('display', 'none', 'important');
-            this.pluginContainer.style.display = 'block';
-            this.pluginContainer.style.setProperty('display', 'block', 'important');
             this.bugMarks.renderBugMark();
             this.bugList.renderBugList();
-            this.clearFormFields();
-            new _bugSidebar__WEBPACK_IMPORTED_MODULE_5__.BugSidebar();
         } catch (error) {
             console.error('Произошла ошибка:', error);
+            document.querySelector('.fbr-plugin-ball-empty').remove();
             if (error.response) {
                 alert(`Произошла ошибка: ${error.response.status}\nОтвет от сервера: ${JSON.stringify(error.response.data.message)}`);
+                
             } else {
                 alert(`Отсутствует соединение с сервером: ${error.message}`);
             }
         } finally {
             this.hideLoader(); // Скрыть лоадер после получения ответа от сервера
             this.submitButton.style.visibility = 'visible'; // Восстанавливаем кнопку "Отправить"
+            this.closeModal()
+            new _bugSidebar__WEBPACK_IMPORTED_MODULE_5__.BugSidebar();
+    
         }
     }
 }
@@ -543,16 +557,24 @@ class DataCollector {
             // Получаем размеры видимой части страницы
             const screenWidth = window.innerWidth || document.documentElement.clientWidth;
             const screenHeight = window.innerHeight || document.documentElement.clientHeight;
-
-            
-            // Если элемент существует, отключаем его
-            const fbrpluginContainer = document.getElementById('fbrpluginContainer');
-            if (fbrpluginContainer) {
-                fbrpluginContainer.style.display = 'none';
-            }
-
-
-        
+    
+            // Находим все элементы с классом fbr-plugin-container и fbr-plugin-ball
+            const pluginContainers = document.querySelectorAll('.fbr-plugin-container');
+            const pluginBalls = document.querySelectorAll('.fbr-plugin-ball');
+    
+            // Сохраняем текущие значения display и скрываем элементы
+            const originalDisplay = [];
+    
+            pluginContainers.forEach(container => {
+                originalDisplay.push({ element: container, display: container.style.display });
+                container.style.display = 'none';
+            });
+    
+            pluginBalls.forEach(ball => {
+                originalDisplay.push({ element: ball, display: ball.style.display });
+                ball.style.display = 'none';
+            });
+    
             // Создаем скриншот видимой части страницы
             html2canvas__WEBPACK_IMPORTED_MODULE_0___default()(document.body, {
                 width: screenWidth,
@@ -562,12 +584,24 @@ class DataCollector {
             }).then(function (canvas) {
                 // Получаем данные из Canvas в формате Data URL (бинарные данные в виде строки)
                 const dataUrl = canvas.toDataURL('image/jpeg'); // Указываем формат изображения
+    
+                // Восстанавливаем значения display у элементов
+                originalDisplay.forEach(item => {
+                    item.element.style.display = item.display;
+                });
+    
                 // Возвращаем Data URL
                 resolve(dataUrl);
-            }).catch(reject);
-
+            }).catch(error => {
+                // В случае ошибки, восстанавливаем значения display у элементов
+                originalDisplay.forEach(item => {
+                    item.element.style.display = item.display;
+                });
+                reject(error);
+            });
         });
     }
+    
 
 
 
@@ -8473,39 +8507,58 @@ class BugMarks {
     this.bugData = new _bugData__WEBPACK_IMPORTED_MODULE_1__.BugData();
     this.dataCollector = new _dataCollector__WEBPACK_IMPORTED_MODULE_2__.DataCollector();
     this.loginModal = new _loginModal__WEBPACK_IMPORTED_MODULE_3__.LoginModal();
-
   }
 
   renderBugMark() {
     const bugListElement = document.querySelector('.fbr-plugin-balls');
     console.log("ПРОВЕРКА списка багов в renderBugMark" + JSON.stringify(this.bugData.bugs));
+    
     // Очищаем текущий список багов
     bugListElement.innerHTML = '';
+
     // Перебираем массив багов и создаем элементы для отображения каждого бага
     this.bugData.bugs.forEach((bug, index) => {
+        // Проверяем свойство existsOnPage
+        if (!bug.existsOnPage) {
+            console.log(`Баг ${bug.taskKey} не существует на странице.`);
+            bug.findElement = false; // Устанавливаем findElement в false
+            return; // Переходим к следующему багу
+        }
+
         // Создаем элемент "ball" для каждого бага
         const ball = document.createElement("div");
         ball.classList.add("fbr-plugin-ball");
+
+        // Определяем статус и устанавливаем data-status
+        if (bug.status === "Закрыт" || bug.status === "Отменено") {
+            ball.setAttribute("data-status", "closed");
+        } else {
+            ball.setAttribute("data-status", "open");
+        }
+
         ball.innerHTML = `
-            <div class="fbr-plugin-ball__number"><a href="https://tracker.yandex.ru/${bug.taskKey}" target="_blank">${bug.bugNumber}</a></div>
+            <div class="fbr-plugin-ball__number">
+                <a href="https://tracker.yandex.ru/${bug.taskKey}" target="_blank">${bug.bugNumber}</a>
+            </div>
             <div class="fbr-plugin-ball__peek">
                 <div class="fbr-plugin-ball__inner">
                     <div class="fbr-plugin-ball__summary">${bug.summary}</div>
                     <div class="fbr-plugin-ball__finalOsVersion">${bug.finalOsVersion}</div>
                     <div class="fbr-plugin-ball__browser">${bug.browser}</div>
-                     <div class="fbr-plugin-ball__browser">${bug.status}</div>
+                    <div class="fbr-plugin-ball__browser">${bug.status}</div>
                 </div>
             </div>
         `;
 
         const dimensions = this.getDimensionsByXPath(bug.xpath);
         if (!dimensions) {
-          console.log("Размеры элемента не найдены, переходим к следующему багу.");
-          bug.findElement = false; // Добавляем свойство findElement: false в объект bug
-          return; // Прерываем текущую итерацию forEach и переходим к следующей итерации
-      } else {
-          bug.findElement = true; // Добавляем свойство findElement: true в объект bug
-      }
+            console.log("Размеры элемента не найдены, переходим к следующему багу.");
+            bug.findElement = false; // Устанавливаем findElement в false
+            return; // Прерываем текущую итерацию forEach и переходим к следующей итерации
+        } else {
+            bug.findElement = true; // Устанавливаем findElement в true
+        }
+
         const { width, height } = dimensions;
         console.log("Размеры элемента после загрузки: " + width + " " + height);
 
@@ -8528,9 +8581,13 @@ class BugMarks {
         // Добавляем элемент "ball" в контейнер
         bugListElement.appendChild(ball);
         console.log("СОЗДАЕМ ШАРИК");
-    });
-}
 
+        // Скрываем элемент, если его статус "closed"
+        if (ball.getAttribute("data-status") === "closed") {
+            ball.style.display = "none";
+        }
+    });
+  }
 
   getDimensionsByXPath(xpathSelector) {
     const element = document.evaluate(
@@ -8543,11 +8600,9 @@ class BugMarks {
     if (element) {
       const width = element.offsetWidth;
       const height = element.offsetHeight;
-      return {width, height}
-
+      return { width, height };
     } else {
       console.error('Элемент не найден по указанному XPath.');
-  
     }
   }
 
@@ -8559,19 +8614,18 @@ class BugMarks {
       XPathResult.FIRST_ORDERED_NODE_TYPE,
       null
     ).singleNodeValue;
-    console.log("getDimensionsByXPath"+xpathSelector);
+    console.log("getDimensionsByXPath" + xpathSelector);
     if (element) {
       const rect = element.getBoundingClientRect();
       const xElement = rect.left + window.scrollX;
       const yElement = rect.top + window.scrollY;
-      return {xElement, yElement}
+      return { xElement, yElement };
     } else {
       console.error('Элемент не найден по указанному XPath.');
     }
   }
+}
 
-
-}  
 
 /***/ }),
 /* 6 */
@@ -13150,15 +13204,18 @@ class BugList {
   }
 
   renderBugList() {
-    const bugListElement = document.querySelector('.fbr-bug-container');
+    const bugListElementOpen = document.querySelector('.fbr-bug-container-open');
+    const bugListElementClosed = document.querySelector('.fbr-bug-container-closed');
 
-    // Очищаем текущий список багов
-    bugListElement.innerHTML = '';
+    // Очищаем текущие списки багов
+    bugListElementOpen.innerHTML = '';
+    bugListElementClosed.innerHTML = '';
 
     // Перебираем массив багов и создаем элементы для отображения каждого бага
-    this.bugData.bugs.forEach((bug, index) => {
-      console.log("ОБНАРУЖН ЭЛЕМЕНТ ИЛИ НЕТ "+bug.findElement);
-        // Создаем ваш элемент "ball" для каждого бага
+    this.bugData.bugs.forEach((bug) => {
+        console.log("ОБНАРУЖЕН ЭЛЕМЕНТ ИЛИ НЕТ " + bug.findElement);
+
+        // Создаем элемент "ball" для каждого бага
         const ball = document.createElement("div");
         ball.classList.add("fbr-bug-card");
 
@@ -13167,23 +13224,51 @@ class BugList {
             ball.classList.add("active");
         }
 
-        ball.innerHTML = `
-            <div class="fbr-bug-card__header">
-                <div class="fbr-bug-card__number">${bug.bugNumber}</div>
-                <div class="fbr-bug-card__author">Lil Pump</div>
-                <div class="fbr-bug-card__date">29.12.23</div>
-            </div>
-            <div class="fbr-bug-card__title">${bug.summary}</div>
-        `;
+        // Проверяем, найден ли элемент на странице, и устанавливаем содержимое
+        if (!bug.findElement) {
+            ball.innerHTML = `
+                <div class="fbr-bug-card__header">
+                    <div class="fbr-bug-card__number">${bug.bugNumber}</div>
+                    <div class="fbr-bug-card__status">${bug.status}</div>
+                    <div class="fbr-bug-card__date">${bug.createdAt}</div>
+                </div>
+                <div class="fbr-bug-card__title">${bug.summary}</div>
+                <div class="fbr-bug-card__author">${bug.author}</div>
+                <div class="fbr-bug-card__author">Элемент бага не обнаружен на странице</div>
+            `;
+        } else {
+            ball.innerHTML = `
+                <div class="fbr-bug-card__header">
+                    <div class="fbr-bug-card__number">${bug.bugNumber}</div>
+                    <div class="fbr-bug-card__status">${bug.status}</div>
+                    <div class="fbr-bug-card__date">${bug.createdAt}</div>
+                </div>
+                <div class="fbr-bug-card__title">${bug.summary}</div>
+                <div class="fbr-bug-card__author">${bug.author}</div>
+            `;
+        }
 
-        // Добавляем элемент "bug" в контейнер
-        bugListElement.appendChild(ball);
+        // Добавляем элемент "bug" в соответствующий контейнер
+        if (bug.status === "Закрыт" || bug.status === "Отменено") {
+            bugListElementClosed.appendChild(ball);
+        } else {
+            bugListElementOpen.appendChild(ball);
+        }
     });
+
+    // Обновляем счетчики
+    this.updateCounters();
 }
 
+  updateCounters() {
+    const openBugsCount = document.querySelector('.fbr-bug-container-open').querySelectorAll('.fbr-bug-card').length;
+    const closedBugsCount = document.querySelector('.fbr-bug-container-closed').querySelectorAll('.fbr-bug-card').length;
 
-
-}  
+    // Обновляем текст кнопок с табами
+    document.querySelector('.fbr-sidebar__tab[data-tab="fbr-sidebar-tab-open"]').textContent = `Активные (${openBugsCount})`;
+    document.querySelector('.fbr-sidebar__tab[data-tab="fbr-sidebar-tab-closed"]').textContent = `Решеные (${closedBugsCount})`;
+  }
+}
 
 /***/ }),
 /* 60 */
@@ -13206,8 +13291,7 @@ function createPluginBall(xRelatively, yRelatively, xPath, container) {
         
         // Создаем ваш элемент "ball"
         const ball = document.createElement("div");
-        ball.classList.add("fbr-plugin-ball");
-        ball.classList.add("fbr-plugin-new-ball");
+        ball.classList.add("fbr-plugin-ball-empty");
         ball.innerHTML = `
             <div class="fbr-plugin-ball__number"><a></a></div>
             <div class="fbr-plugin-ball__peek">
@@ -13362,6 +13446,7 @@ class BugService {
             this.bugData.setBugs(data);
             this.bugMarks.renderBugMark()
             this.bugList.renderBugList()
+           
         } catch (error) {
             console.error('Произошла ошибка:', error);
             alert(`Отсутствует соединение с сервером: ${error}`);
@@ -13508,8 +13593,8 @@ function frontendPlugin() {
 
 			</div>
 			<div class="fbr-sidebar__tabs">
-				<button class="fbr-sidebar__tab sidebar__tab--active" data-tab="sidebar-tab1">Активные (0)</button>
-				<button class="fbr-sidebar__tab" data-tab="sidebar-tab2">Решеные (0)</button>
+				<button class="fbr-sidebar__tab fbr-sidebar__tab--active" data-tab="fbr-sidebar-tab-open">Активные (0)</button>
+				<button class="fbr-sidebar__tab" data-tab="fbr-sidebar-tab-closed">Решеные (0)</button>
 			</div>
 			<div class="fbr-sidebar__filter">
 				<div class="fbr-custom-section">
@@ -13517,10 +13602,6 @@ function frontendPlugin() {
 					<div class="fbr-custom-dropdown">
 							<input type="text" id="fbr-parent-task" placeholder="Родительская задача">
 							<ul id="fbr-task-list" class="fbr-dropdown-content">
-									<li>QA-1</li>
-									<li>QA-2</li>
-									<li>QA-3</li>
-									<li>Все баги</li>
 							</ul>
 				
 							<label>
@@ -13536,13 +13617,13 @@ function frontendPlugin() {
 
 			</div>
 	</div>
-			<div class="fbr-sidebar__tab-content fbr-sidebar__tab-content--active" id="sidebar-tab1">
-				<div class="fbr-bug-container">
+			<div class="fbr-sidebar__tab-content fbr-sidebar__tab-content--active" id="fbr-sidebar-tab-open">
+				<div class="fbr-bug-container-open">
 					
 				</div>
 			</div>
-			<div class="fbr-sidebar__tab-content" id="sidebar-tab2">
-				<div class="fbr-bug-container">
+			<div class="fbr-sidebar__tab-content" id="fbr-sidebar-tab-closed">
+				<div class="fbr-bug-container-closed">
 					<span>Контент для Таба 2</span>
 				</div>
 			</div>
@@ -13587,10 +13668,10 @@ function frontendPlugin() {
   z-index: 2147483600 !important;
 }
 .fbr-bug-card__number {
-  width: 26px !important;
-  height: 26px !important;
+  width: 35px !important;
+  height: 35px !important;
   line-height: 20px !important;
-  font-size: 10px !important;
+  font-size: 14px !important;
   border: 2px solid #fff !important;
   background: #2ea2f6 !important;
   margin-right: 5px !important;
@@ -13604,6 +13685,16 @@ function frontendPlugin() {
   z-index: 2147483599 !important;
 }
 .fbr-bug-card__author {
+  flex-grow: 1 !important; /* Занимает оставшееся место в строке */
+  margin-right: 10px !important;
+  font-family: "Poppins", sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  line-height: 20px !important;
+  color: #1c232d !important;
+  z-index: 2147483599 !important;
+}
+.fbr-bug-card__status {
   flex-grow: 1 !important; /* Занимает оставшееся место в строке */
   margin-right: 10px !important;
   font-family: "Poppins", sans-serif !important;
@@ -14032,6 +14123,17 @@ function frontendPlugin() {
   font-size: 13px !important;
 }
 
+.fbr-plugin-ball-empty {
+  position: absolute !important;
+  width: 38px !important;
+  height: 38px !important;
+  transition: transform 0.12s ease, opacity 0.12s ease !important;
+  background-color: #2ea2f6 !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  z-index: 2147483600 !important;
+}
+
 .fbr-plugin-ball__number:hover + .fbr-plugin-ball__peek .fbr-plugin-ball__inner {
   display: block !important; /* Отображение элемента при наведении на .plugin-ball__number */
   position: absolute !important;
@@ -14293,239 +14395,285 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Sidebar: function() { return /* binding */ Sidebar; }
 /* harmony export */ });
-/* harmony import */ var _bugSidebar__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(61);
+/* harmony import */ var _interceptor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
+/* harmony import */ var _bugMarks__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
+/* harmony import */ var _bugList__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(59);
+/* harmony import */ var _bugData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(57);
+/* harmony import */ var _loginModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(58);
+/* harmony import */ var _bugSidebar__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(61);
+/* harmony import */ var _dataCollector__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(3);
+/* harmony import */ var _config_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(7);
+
+
+
+
+
+
+
+
 
 class Sidebar {
     constructor() {
+        this.bugData = new _bugData__WEBPACK_IMPORTED_MODULE_3__.BugData();
+        this.bugMarks = new _bugMarks__WEBPACK_IMPORTED_MODULE_1__.BugMarks(this.bugData);
+        this.bugList = new _bugList__WEBPACK_IMPORTED_MODULE_2__.BugList(this.bugData);
+        this.loginModal = new _loginModal__WEBPACK_IMPORTED_MODULE_4__.LoginModal();
+        this.dataCollector = new _dataCollector__WEBPACK_IMPORTED_MODULE_6__.DataCollector();
+
         this.sidebarToggleBtn = document.getElementById("fbr-sidebarToggleBtn");
         this.sidebar = document.getElementById("sidebar");
 
         // Табы в сайдбаре
         this.tabButtons = document.querySelectorAll(".fbr-sidebar__tab");
         this.tabContents = document.querySelectorAll(".fbr-sidebar__tab-content");
+        this.dropdown = document.getElementById('fbr-task-list');
+        this.inputField = document.getElementById('fbr-parent-task');
+        this.applyBtn = document.getElementById('fbr-apply-btn');
+        this.allPagesCheckbox = document.getElementById('fbr-all-pages');
+        this.loader = document.querySelector('.fbr-loader-filter');
 
         // Вызов метода для открытия сайдбара
         this.openSidebar();
-        this.openScreenSidebar()
+        this.openScreenSidebar();
 
+        // Добавляем обработчик для inputField
+        this.inputField.addEventListener("click", () => {
+            this.showDropdown();
+        });
+
+               // Добавляем обработчик для клика вне dropdown
+               document.addEventListener('click', (e) => {
+                this.hideDropdownOnClickOutside(e);
+            });
+        // Добавляем обработчик для кнопки применения
+        this.applyBtn.addEventListener('click', () => {
+            this.applySelectedValue();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            this.loadInitialValue();
+            this.populateDropdown();
+        });
+    }
+
+    populateDropdown() {
+        const parentKey = localStorage.getItem('parentKeyforFBR');
+  
+        if (parentKey) {
+            const keys = parentKey.split(',');
+    
+            // Очищаем текущий список элементов
+            this.dropdown.innerHTML = '';
+    
+            // Добавляем каждый элемент в список
+            keys.forEach(key => {
+                const li = document.createElement('li');
+                li.textContent = key;
+                this.dropdown.appendChild(li);
+            });
+    
+            // Добавляем элемент "Все баги" в конец списка
+            const allBugsLi = document.createElement('li');
+            allBugsLi.textContent = 'Все баги';
+            this.dropdown.appendChild(allBugsLi);
+        } else {
+            // Если parentKey пуст или не существует, добавляем только элемент "Все баги"
+            this.dropdown.innerHTML = '<li>Все баги</li>';
+        }
+
+        // Добавляем обработчики для кликов по элементам списка dropdown после их создания
+        this.dropdown.querySelectorAll('li').forEach(item => {
+            item.addEventListener('click', (e) => {
+                this.setInputFieldValue(e);
+                this.hideDropdown();
+            });
+        });
+    }
+
+    loadInitialValue() {
+      const parentKey = localStorage.getItem('parentKeyforFBR');
+      if (parentKey) {
+        // Извлекаем первое значение из parentKey
+        const firstParentKey = parentKey.split(',')[0];
+        this.inputField.value = firstParentKey;
+    }
     }
 
     openSidebar() {
         this.sidebarToggleBtn.addEventListener("click", () => {
             this.sidebar.classList.toggle('fbr-sidebar--active');
-            this.bugSidebar = new _bugSidebar__WEBPACK_IMPORTED_MODULE_0__.BugSidebar()
+            this.bugSidebar = new _bugSidebar__WEBPACK_IMPORTED_MODULE_5__.BugSidebar()
+            this.loadInitialValue();
+            this.populateDropdown();
         });
     }
 
- openScreenSidebar() {
+    showDropdown() {
+        this.dropdown.style.setProperty('display', 'block', 'important');
+      }
+      
+      hideDropdown() {
+        this.dropdown.style.setProperty('display', 'none', 'important');
+    } 
+    
+    hideDropdownOnClickOutside(e) {
+        if (!this.dropdown.contains(e.target) && e.target !== this.inputField) {
+            this.hideDropdown();
+        }
+    }
+
+    setInputFieldValue(e) {
+        this.inputField.value = e.target.textContent;
+    }
+
+
+
+    applySelectedValue() {
+        const selectedValue = this.inputField.value.trim();
+        
+        if (selectedValue !== '') {
+          localStorage.setItem('parentKeyforFBR', selectedValue);
+          
+          if (this.allPagesCheckbox.checked) {
+            this.sendGetRequestToBugList(selectedValue);
+          } else {
+            this.sendGetRequest(selectedValue);
+          }
+        } else {
+          alert('Выберите или введите значение для родительской задачи');
+        }
+      }
+    
+      async sendGetRequest(parentKey) {
+        const token = localStorage.getItem('tokenFBR');
+        if (!token) {
+          this.loginModal.showLoginForm();
+          throw new Error('Token is not available in localStorage');
+        }
+    
+        try {
+          this.showLoader();
+          const response = await _interceptor__WEBPACK_IMPORTED_MODULE_0__["default"].get(`${_config_js__WEBPACK_IMPORTED_MODULE_7__["default"].apiUrl}/bugs`, {
+            params: {
+              url: window.location.href,
+              parentKey: parentKey
+            },
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          this.handleResponse(response);
+        } catch (error) {
+          console.error('Произошла ошибка:', error);
+          if (error.response) {
+              alert(`Произошла ошибка: ${error.response.status}\nОтвет от сервера: ${JSON.stringify(error.response.data.message)}`);
+          } else {
+              alert(`Отсутствует соединение с сервером: ${error.message}`);
+          }
+      } finally {
+        this.hideLoader(); // Скрыть лоадер после получения ответа от сервера
+    }
+      }
+    
+      async sendGetRequestToBugList(parentKey) {
+        const token = localStorage.getItem('tokenFBR');
+        if (!token) {
+          this.loginModal.showLoginForm();
+          throw new Error('Token is not available in localStorage');
+        }
+    
+        try {
+          this.showLoader();
+          const response = await _interceptor__WEBPACK_IMPORTED_MODULE_0__["default"].get(`${_config_js__WEBPACK_IMPORTED_MODULE_7__["default"].apiUrl}/bugList`, {
+            params: {
+              url: window.location.href,
+              parentKey: parentKey
+            },
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          this.handleResponse(response);
+        } catch (error) {
+          console.error('Произошла ошибка:', error);
+          if (error.response) {
+              alert(`Произошла ошибка: ${error.response.status}\nОтвет от сервера: ${JSON.stringify(error.response.data.message)}`);
+          } else {
+              alert(`Отсутствует соединение с сервером: ${error.message}`);
+          }
+      } finally {
+        this.hideLoader(); // Скрыть лоадер после получения ответа от сервера
+    }
+      }
+    
+      handleResponse(response) {
+        const data = response.data.bugs;
+        const parentKey = response.data.parentKeyForForm;
+    
+        console.log("ОТОБРАЖЕНИЕ parentKeyforFBR после отправки бага " + parentKey);
+        localStorage.setItem('parentKeyforFBR', parentKey);
+    
+        console.log('Ответ от сервера:', data);
+    
+        this.bugData.setBugs(data);
+        this.bugMarks.renderBugMark();
+        this.bugList.renderBugList();
+      }
+    
+      showLoader() {
+        this.loader.style.display = 'block';
+        this.applyBtn.style.visibility = 'hidden'; // Скрываем кнопку "Отправить"
+      }
+    
+      hideLoader() {
+        this.loader.style.display = 'none';
+        this.applyBtn.style.visibility = 'visible'; // Восстанавливаем кнопку "Отправить"
+      }
+
+
+
+openScreenSidebar() {
     this.tabButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-        console.log("Убираем класс");
-        // Убираем активный класс у всех вкладок и контента
-        this.tabButtons.forEach((btn) => btn.classList.remove("fbr-sidebar__tab--active"));
-        this.tabContents.forEach((content) => content.classList.remove("fbr-sidebar__tab-content--active"));
+        button.addEventListener("click", () => {
+            console.log("Убираем класс");
+            // Убираем активный класс у всех вкладок и контента
+            this.tabButtons.forEach((btn) => btn.classList.remove("fbr-sidebar__tab--active"));
+            this.tabContents.forEach((content) => content.classList.remove("fbr-sidebar__tab-content--active"));
 
-        // Добавляем активный класс к выбранной вкладке и соответствующему контенту
-        const tabId = button.getAttribute("data-tab");
-        const tabContent = document.getElementById(tabId);
+            // Добавляем активный класс к выбранной вкладке и соответствующему контенту
+            const tabId = button.getAttribute("data-tab");
+            const tabContent = document.getElementById(tabId);
 
-        button.classList.add("fbr-sidebar__tab--active");
-        tabContent.classList.add("fbr-sidebar__tab-content--active");
+            button.classList.add("fbr-sidebar__tab--active");
+            tabContent.classList.add("fbr-sidebar__tab-content--active");
+
+            // Перебираем все элементы с классом fbr-plugin-ball
+            const balls = document.querySelectorAll(".fbr-plugin-ball");
+
+            balls.forEach((ball) => {
+                const status = ball.getAttribute("data-status");
+
+                if (tabId === "fbr-sidebar-tab-open") {
+                    if (status === "open") {
+                        ball.style.display = "block";
+                    } else if (status === "closed") {
+                        ball.style.display = "none";
+                    }
+                } else if (tabId === "fbr-sidebar-tab-closed") {
+                    if (status === "closed") {
+                        ball.style.display = "block";
+                    } else if (status === "open") {
+                        ball.style.display = "none";
+                    }
+                }
+            });
+        });
     });
-    });
-
-    // // Получаем ссылки на основной сайдбар и сайдбар бага
-    // const bugSidebar = document.getElementById('bug-sidebar');
-
-    // // Получаем ссылки на все карточки багов
-    // const bugCards = document.querySelectorAll('.fbr-bug-card');
-
 }
 }
 
 /***/ }),
 /* 65 */
-/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   SidebarFilter: function() { return /* binding */ SidebarFilter; }
-/* harmony export */ });
-/* harmony import */ var _interceptor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
-/* harmony import */ var _bugMarks__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
-/* harmony import */ var _bugList__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(59);
-/* harmony import */ var _bugData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(57);
-/* harmony import */ var _loginModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(58);
-
-
-
-
-
-
-class SidebarFilter {
-  constructor() {
-    document.addEventListener('DOMContentLoaded', this.init.bind(this));
-    this.bugData = new _bugData__WEBPACK_IMPORTED_MODULE_3__.BugData();
-    this.bugMarks = new _bugMarks__WEBPACK_IMPORTED_MODULE_1__.BugMarks(this.bugData);
-    this.bugList = new _bugList__WEBPACK_IMPORTED_MODULE_2__.BugList(this.bugData);
-    this.loginModal = new _loginModal__WEBPACK_IMPORTED_MODULE_4__.LoginModal();
-
-    this.submitButton = document.getElementById('fbr-apply-btn');
-    this.loader = document.querySelector('.fbr-loader-filter');
-  }
-
-  init() {
-    this.inputField = document.getElementById('fbr-parent-task');
-    this.dropdown = document.getElementById('fbr-task-list');
-    this.applyBtn = document.getElementById('fbr-apply-btn');
-    this.allPagesCheckbox = document.getElementById('fbr-all-pages');
-
-    this.loadInitialValue();
-    this.addEventListeners();
-  }
-
-  loadInitialValue() {
-    const parentKey = localStorage.getItem('parentKeyforFBR');
-    if (parentKey) {
-      this.inputField.value = parentKey;
-    }
-  }
-
-  addEventListeners() {
-    this.inputField.addEventListener('focus', this.showDropdown.bind(this));
-    document.addEventListener('click', this.hideDropdownOnClickOutside.bind(this));
-    this.dropdown.addEventListener('click', this.fillInputField.bind(this));
-    this.applyBtn.addEventListener('click', this.applySelectedValue.bind(this));
-  }
-
-  showDropdown() {
-    this.dropdown.style.setProperty('display', 'block', 'important');
-  }
-
-  hideDropdownOnClickOutside(e) {
-    if (!document.querySelector('.fbr-custom-dropdown').contains(e.target)) {
-      this.dropdown.style.display = 'none';
-    }
-  }
-
-  fillInputField(e) {
-    if (e.target.tagName === 'LI') {
-      const selectedValue = e.target.textContent;
-      this.inputField.value = selectedValue;
-      this.dropdown.style.display = 'none';
-      localStorage.setItem('parentKeyforFBR', selectedValue);
-    }
-  }
-
-  applySelectedValue() {
-    const selectedValue = this.inputField.value.trim();
-    
-    if (selectedValue !== '') {
-      localStorage.setItem('parentKeyforFBR', selectedValue);
-      
-      if (this.allPagesCheckbox.checked) {
-        this.sendGetRequestToBugList(selectedValue);
-      } else {
-        this.sendGetRequest(selectedValue);
-      }
-    } else {
-      alert('Выберите или введите значение для родительской задачи');
-    }
-  }
-
-  async sendGetRequest(parentKey) {
-    const token = localStorage.getItem('tokenFBR');
-    if (!token) {
-      this.loginModal.showLoginForm();
-      throw new Error('Token is not available in localStorage');
-    }
-
-    try {
-      this.showLoader();
-      const response = await _interceptor__WEBPACK_IMPORTED_MODULE_0__["default"].get('http://localhost:3000/api/bugs', {
-        params: {
-          url: window.location.href,
-          parentKey: parentKey
-        },
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      this.handleResponse(response);
-    } catch (error) {
-      console.error('Произошла ошибка:', error);
-      if (error.response) {
-          alert(`Произошла ошибка: ${error.response.status}\nОтвет от сервера: ${JSON.stringify(error.response.data.message)}`);
-      } else {
-          alert(`Отсутствует соединение с сервером: ${error.message}`);
-      }
-  } finally {
-    this.hideLoader(); // Скрыть лоадер после получения ответа от сервера
-}
-  }
-
-  async sendGetRequestToBugList(parentKey) {
-    const token = localStorage.getItem('tokenFBR');
-    if (!token) {
-      this.loginModal.showLoginForm();
-      throw new Error('Token is not available in localStorage');
-    }
-
-    try {
-      this.showLoader();
-      const response = await _interceptor__WEBPACK_IMPORTED_MODULE_0__["default"].get('http://localhost:3000/api/bugList', {
-        params: {
-          parentKey: parentKey
-        },
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      this.handleResponse(response);
-    } catch (error) {
-      console.error('Произошла ошибка:', error);
-      if (error.response) {
-          alert(`Произошла ошибка: ${error.response.status}\nОтвет от сервера: ${JSON.stringify(error.response.data.message)}`);
-      } else {
-          alert(`Отсутствует соединение с сервером: ${error.message}`);
-      }
-  } finally {
-    this.hideLoader(); // Скрыть лоадер после получения ответа от сервера
-}
-  }
-
-  handleResponse(response) {
-    const data = response.data.bugs;
-    const parentKey = response.data.parentKeyForForm;
-
-    console.log("ОТОБРАЖЕНИЕ parentKeyforFBR после отправки бага " + parentKey);
-    localStorage.setItem('parentKeyforFBR', parentKey);
-
-    console.log('Ответ от сервера:', data);
-
-    this.bugData.setBugs(data);
-    this.bugMarks.renderBugMark();
-    this.bugList.renderBugList();
-  }
-
-  showLoader() {
-   
-    this.loader.style.display = 'block';
-    this.submitButton.style.visibility = 'hidden'; // Скрываем кнопку "Отправить"
-}
-
-// Скрыть лоадер
-hideLoader() {
-    
-  this.loader.style.display = 'none';
-    this.submitButton.style.visibility = 'visible'; // Восстанавливаем кнопку "Отправить"
-}
-}
-
-
-/***/ }),
-/* 66 */
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14579,6 +14727,7 @@ class Login {
                 alert('Login successful!');
                 this.bugService.getResponseBugs()
                 this.loginModal.closeModal();
+           
           
             } else {
                 alert('Login failed!');
@@ -14671,15 +14820,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_bugService__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(62);
 /* harmony import */ var _modules_frontendPlugin__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(63);
 /* harmony import */ var _modules_sidebar__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(64);
-/* harmony import */ var _modules_sidebarFilter__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(65);
-/* harmony import */ var _modules_login__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(66);
+/* harmony import */ var _modules_login__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(65);
 
  // Импорт класса ModalHandler
 
 
  // Импорт фронтенда
 
-
+// import { SidebarFilter } from "./modules/sidebarFilter";
 
 
 
@@ -14689,12 +14837,13 @@ const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has('fbr')) {
   
 (0,_modules_frontendPlugin__WEBPACK_IMPORTED_MODULE_4__.frontendPlugin)();
-new _modules_login__WEBPACK_IMPORTED_MODULE_7__.Login();
+new _modules_login__WEBPACK_IMPORTED_MODULE_6__.Login();
 const modalHandler = new _modules_modal__WEBPACK_IMPORTED_MODULE_1__.ModalHandler();
 const sidebar = new _modules_sidebar__WEBPACK_IMPORTED_MODULE_5__.Sidebar();
 const bugService = new _modules_bugService__WEBPACK_IMPORTED_MODULE_3__.BugService();
 const bugMarks = new _modules_bugMarks__WEBPACK_IMPORTED_MODULE_2__.BugMarks();
 const toggleCommentHandler = new _modules_toggleComment__WEBPACK_IMPORTED_MODULE_0__.ToggleCommentHandler();
+// const sidebarFilter = new SidebarFilter();
 
 
 modalHandler.setupStepNavigation()
@@ -14744,7 +14893,7 @@ window.addEventListener('resize', function() {
 
 });
 
-const sidebarFilter = new _modules_sidebarFilter__WEBPACK_IMPORTED_MODULE_6__.SidebarFilter();
+
 
 
 
