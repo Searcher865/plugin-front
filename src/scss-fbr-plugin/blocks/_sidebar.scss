@@ -22,18 +22,19 @@
     &__toggle {
         pointer-events: all !important;
         position: fixed !important;
-        bottom: 15px !important;
+        bottom: 70px !important;
         left: 15px !important;
-        z-index: 2147483601 !important;
+        z-index: 2147483602 !important;
 
         &-btn {
+            display: none !important;
             width: 60px !important;
             height: 60px !important;
             background-color: white !important;
             border-radius: 100% !important;
-            box-shadow: 0 10px 35px 0 rgba(0, 0, 0, .15) !important;
+            box-shadow: 0 10px 35px 0 rgba(0, 0, 0, .35) !important;
             z-index: 2147483600 !important;
-
+            position: absolute !important;
             img {
                 width: 30px !important;
                 height: 30px !important;
@@ -109,7 +110,7 @@
         color: white !important;
         display: none !important;
         z-index: 2147483600 !important;
-
+        padding-bottom: 100px !important;
         &--active {
             display: block !important;
             z-index: 2147483600 !important;

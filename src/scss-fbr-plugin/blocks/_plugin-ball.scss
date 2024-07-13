@@ -35,12 +35,14 @@
     &__inner {
         display: none !important;
         z-index: 2147483600 !important;
+        font-family: "Poppins", sans-serif !important;
     }
     &__summary {
         font-size: 13px !important;
     }
 }
 .fbr-plugin-ball-empty {
+    font-family: "Poppins", sans-serif !important;
     position: absolute !important;
     width: 38px !important;
     height: 38px !important;

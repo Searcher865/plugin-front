@@ -1,7 +1,13 @@
+import { BugMarks } from './bugMarks';
+import { BugList } from './bugList';
+
 export class ToggleCommentHandler {
     constructor() {
+      this.btnSidebar = document.getElementById('fbr-sidebarToggleBtn');
       document.addEventListener('click', this.handleClick.bind(this));
       document.addEventListener('keydown', this.handleKeyDown.bind(this));
+      this.bugMarks = new BugMarks();
+      this.bugList = new BugList();
     }
   
     handleClick(event) {
@@ -37,8 +43,21 @@ export class ToggleCommentHandler {
   
       if (currentDataActive === 'false') {
         commentTogle.setAttribute('data-active', 'true');
+        this.bugMarks.renderBugMark();
+        this.btnSidebar.style.cssText = 'display: ' + "block" + ' !important;';
+        this.bugList.renderBugList();
       } else {
         commentTogle.setAttribute('data-active', 'false');
+        const balls = document.querySelectorAll(".fbr-plugin-ball");
+        balls.forEach(element => {
+          element.remove();
+      });
+      const bugCards = document.querySelectorAll(".fbr-bug-card ");
+      bugCards.forEach(element => {
+        element.remove();
+    });
+    this.btnSidebar.style.cssText = 'display: ' + "none" + ' !important;';
+
       }
   
       commentSwitch.classList.toggle('fbr-comment__switch--active');

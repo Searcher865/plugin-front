@@ -182,7 +182,7 @@ export function frontendPlugin() {
 }
 
 .fbr-highlight {
-  box-shadow: 0 0 0 2px blue !important; /* Синяя обводка с важностью */
+  box-shadow: 0 0 0 3px blue !important; /* Синяя обводка с важностью */
 }
 
 .fbr-bug-card {
@@ -651,12 +651,14 @@ export function frontendPlugin() {
 .fbr-plugin-ball__inner {
   display: none !important;
   z-index: 2147483600 !important;
+  font-family: "Poppins", sans-serif !important;
 }
 .fbr-plugin-ball__summary {
   font-size: 13px !important;
 }
 
 .fbr-plugin-ball-empty {
+  font-family: "Poppins", sans-serif !important;
   position: absolute !important;
   width: 38px !important;
   height: 38px !important;
@@ -724,17 +726,19 @@ export function frontendPlugin() {
 .fbr-sidebar__toggle {
   pointer-events: all !important;
   position: fixed !important;
-  bottom: 15px !important;
+  bottom: 70px !important;
   left: 15px !important;
-  z-index: 2147483601 !important;
+  z-index: 2147483602 !important;
 }
 .fbr-sidebar__toggle-btn {
+  display: none !important;
   width: 60px !important;
   height: 60px !important;
   background-color: white !important;
   border-radius: 100% !important;
-  box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.35) !important;
   z-index: 2147483600 !important;
+  position: absolute !important;
 }
 .fbr-sidebar__toggle-btn img {
   width: 30px !important;
@@ -800,6 +804,7 @@ export function frontendPlugin() {
   color: white !important;
   display: none !important;
   z-index: 2147483600 !important;
+  padding-bottom: 100px !important;
 }
 .fbr-sidebar__tab-content--active {
   display: block !important;

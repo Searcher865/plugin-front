@@ -185,19 +185,19 @@ gulp.task('images:dev', function () {
 		.pipe(gulp.dest('./build/img/'));
 });
 
-gulp.task('fonts:dev', function () {
-	return gulp
-		.src('./src/fonts/**/*')
-		.pipe(changed('./build/fonts/'))
-		.pipe(gulp.dest('./build/fonts/'));
-});
+// gulp.task('fonts:dev', function () {
+// 	return gulp
+// 		.src('./src/fonts/**/*')
+// 		.pipe(changed('./build/fonts/'))
+// 		.pipe(gulp.dest('./build/fonts/'));
+// });
 
-gulp.task('files:dev', function () {
-	return gulp
-		.src('./src/files/**/*')
-		.pipe(changed('./build/files/'))
-		.pipe(gulp.dest('./build/files/'));
-});
+// gulp.task('files:dev', function () {
+// 	return gulp
+// 		.src('./src/files/**/*')
+// 		.pipe(changed('./build/files/'))
+// 		.pipe(gulp.dest('./build/files/'));
+// });
 
 gulp.task('js:dev', function () {
 	return gulp
@@ -235,8 +235,8 @@ gulp.task('watch:dev', function () {
 	gulp.watch('./src/scss/**/*.scss', gulp.parallel('sass:dev'));
 	gulp.watch(['./src/html/**/*.html', '!./src/html/preIndex.html'], gulp.parallel('html:dev')); // Обработка всех HTML файлов кроме preIndex.html
 	gulp.watch('./src/img/**/*', gulp.parallel('images:dev'));
-	gulp.watch('./src/fonts/**/*', gulp.parallel('fonts:dev'));
-	gulp.watch('./src/files/**/*', gulp.parallel('files:dev'));
+	// gulp.watch('./src/fonts/**/*', gulp.parallel('fonts:dev'));
+	// gulp.watch('./src/files/**/*', gulp.parallel('files:dev'));
 	gulp.watch('./src/js/**/*.js', gulp.parallel('js:dev'));
 });
 

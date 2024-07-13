@@ -3,15 +3,23 @@ import { BugData } from './bugData';
 import { DataCollector } from './dataCollector';
 import { LoginModal } from './loginModal';
 
+
 export class BugMarks {
 
   constructor() {
     this.bugData = new BugData();
     this.dataCollector = new DataCollector();
     this.loginModal = new LoginModal();
+    this.toggleElement = document.getElementById('plugin-comment-togle')
   }
 
   renderBugMark() {
+    const isActive = this.toggleElement.getAttribute('data-active');
+    if (isActive !== 'true') {
+        return; // Если data-active не равен 'true', выходим из функции
+    }
+
+
     const bugListElement = document.querySelector('.fbr-plugin-balls');
     console.log("ПРОВЕРКА списка багов в renderBugMark" + JSON.stringify(this.bugData.bugs));
     

@@ -31,6 +31,7 @@ export class ModalHandler {
         this.bugFileInput = document.getElementById('bug-file');
         this.selectedPriority = document.getElementById('bug-priority');
         this.selectedTags = document.getElementById('bug-tags');
+        this.toggleElement = document.getElementById('plugin-comment-togle');
         // Находим все элементы с классом .fbr-bug-report__step
         this.steps = document.querySelectorAll('.fbr-bug-report__step');
         // Находим все элементы с классом .fbr-bug-report__tab
@@ -49,6 +50,12 @@ export class ModalHandler {
         }
         // Обработка чтобы модальное окно не открывалось при клике на элементы модального окна, но остальныесобытия внутри модального окна работали
         document.addEventListener('click', (event) => {
+                            // Проверяем значение атрибута data-active
+                            const isActive = this.toggleElement.getAttribute('data-active');
+                            if (isActive !== 'true') {
+                                return; // Если data-active не равен 'true', выходим из функции
+                            }
+                            
             // Получаем целевой элемент, на который кликнули
             const targetElement = event.target;
 
@@ -68,11 +75,13 @@ export class ModalHandler {
 
                 // Если клик был вне контейнера, выполняйте ваш код
                 if (!isInsideContainer) {
+                    event.stopImmediatePropagation(); // Останавливаем дальнейшее распространение события
+                    event.preventDefault(); // Предотвращаем действие по умолчанию
                     this.openModal(event);
                     event.stopPropagation();
                 }
             }
-        });
+        }, true);
 
 
         // Находим кнопку с классом bug-report__cancel-button
@@ -110,6 +119,8 @@ export class ModalHandler {
         // Проверяем, что модальное окно закрыто
         if (this.modalElement.style.display === 'none' || this.modalElement.style.display === '') {
             try {
+
+
                 // Начинаем с показа первого этапа по умолчанию
                 this.showStep('1', this.steps, this.tabs);
                 const { xClick, yClick, xRelatively, yRelatively, heightRatio, widthRatio } = this.dataCollector.getClickCoordinates(event); // Обращаемся к функции, которая собирает данные со страницы

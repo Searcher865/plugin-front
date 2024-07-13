@@ -203,19 +203,19 @@ gulp.task('images:prod', function () {
 		.pipe(gulp.dest('./prod/img/'));
 });
 
-gulp.task('fonts:prod', function () {
-	return gulp
-		.src('./src/fonts/**/*')
-		.pipe(changed('./prod/fonts/'))
-		.pipe(gulp.dest('./prod/fonts/'));
-});
+// gulp.task('fonts:prod', function () {
+// 	return gulp
+// 		.src('./src/fonts/**/*')
+// 		.pipe(changed('./prod/fonts/'))
+// 		.pipe(gulp.dest('./prod/fonts/'));
+// });
 
-gulp.task('files:prod', function () {
-	return gulp
-		.src('./src/files/**/*')
-		.pipe(changed('./prod/files/'))
-		.pipe(gulp.dest('./prod/files/'));
-});
+// gulp.task('files:prod', function () {
+// 	return gulp
+// 		.src('./src/files/**/*')
+// 		.pipe(changed('./prod/files/'))
+// 		.pipe(gulp.dest('./prod/files/'));
+// });
 
 gulp.task('js:prod', function () {
 	return gulp
@@ -251,8 +251,8 @@ gulp.task('watch:prod', function () {
 	gulp.watch('./src/scss/**/*.scss', gulp.parallel('sass:prod'));
 	gulp.watch(['./src/html/**/*.html', '!./src/html/preIndex.html'], gulp.parallel('html:prod')); // Обработка всех HTML файлов кроме preIndex.html
 	gulp.watch('./src/img/**/*', gulp.parallel('images:prod'));
-	gulp.watch('./src/fonts/**/*', gulp.parallel('fonts:prod'));
-	gulp.watch('./src/files/**/*', gulp.parallel('files:prod'));
+	// gulp.watch('./src/fonts/**/*', gulp.parallel('fonts:prod'));
+	// gulp.watch('./src/files/**/*', gulp.parallel('files:prod'));
 	gulp.watch('./src/js/**/*.js', gulp.parallel('js:prod'));
 });
 
